@@ -1,4 +1,4 @@
-; ModuleID = 'source.cpp'
+; ModuleID = 'optimized.ll'
 source_filename = "source.cpp"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
@@ -56,7 +56,7 @@ define dso_local noundef double @_Z8distance5PointS_(double %0, double %1, doubl
   %6 = fsub double %1, %3
   %7 = fmul double %6, %6
   %8 = tail call double @llvm.fmuladd.f64(double %5, double %5, double %7)
-  %9 = tail call double @sqrt(double noundef %8) #17
+  %9 = tail call double @sqrt(double noundef %8) #16
   ret double %9
 }
 
@@ -73,7 +73,7 @@ define dso_local void @_Z16assignToClustersRKSt6vectorI5PointSaIS0_EES4_RS_IiSaI
   %6 = load %struct.Point*, %struct.Point** %4, align 8, !tbaa !5
   %7 = load %struct.Point*, %struct.Point** %5, align 8, !tbaa !10
   %8 = icmp eq %struct.Point* %6, %7
-  br i1 %8, label %22, label %9
+  br i1 %8, label %.loopexit, label %9
 
 9:                                                ; preds = %3
   %10 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %1, i64 0, i32 0, i32 0, i32 0, i32 1
@@ -83,76 +83,76 @@ define dso_local void @_Z16assignToClustersRKSt6vectorI5PointSaIS0_EES4_RS_IiSaI
   %14 = load %struct.Point*, %struct.Point** %11, align 8, !tbaa !10
   br label %15
 
-15:                                               ; preds = %9, %26
-  %16 = phi %struct.Point* [ %7, %9 ], [ %27, %26 ]
-  %17 = phi %struct.Point* [ %6, %9 ], [ %28, %26 ]
-  %18 = phi %struct.Point* [ %14, %9 ], [ %29, %26 ]
-  %19 = phi %struct.Point* [ %13, %9 ], [ %30, %26 ]
-  %20 = phi i64 [ 0, %9 ], [ %34, %26 ]
+15:                                               ; preds = %25, %9
+  %16 = phi %struct.Point* [ %7, %9 ], [ %26, %25 ]
+  %17 = phi %struct.Point* [ %6, %9 ], [ %27, %25 ]
+  %18 = phi %struct.Point* [ %14, %9 ], [ %28, %25 ]
+  %19 = phi %struct.Point* [ %13, %9 ], [ %29, %25 ]
+  %20 = phi i64 [ 0, %9 ], [ %33, %25 ]
   %21 = icmp eq %struct.Point* %19, %18
-  br i1 %21, label %26, label %40
+  br i1 %21, label %25, label %.preheader
 
-22:                                               ; preds = %26, %3
+.loopexit:                                        ; preds = %25, %3
   ret void
 
-23:                                               ; preds = %40
-  %24 = load %struct.Point*, %struct.Point** %4, align 8, !tbaa !5
-  %25 = load %struct.Point*, %struct.Point** %5, align 8, !tbaa !10
-  br label %26
+22:                                               ; preds = %.preheader
+  %23 = load %struct.Point*, %struct.Point** %4, align 8, !tbaa !5
+  %24 = load %struct.Point*, %struct.Point** %5, align 8, !tbaa !10
+  br label %25
 
-26:                                               ; preds = %23, %15
-  %27 = phi %struct.Point* [ %16, %15 ], [ %25, %23 ]
-  %28 = phi %struct.Point* [ %17, %15 ], [ %24, %23 ]
-  %29 = phi %struct.Point* [ %18, %15 ], [ %64, %23 ]
-  %30 = phi %struct.Point* [ %18, %15 ], [ %63, %23 ]
-  %31 = phi i32 [ 0, %15 ], [ %61, %23 ]
-  %32 = load i32*, i32** %12, align 8, !tbaa !11
-  %33 = getelementptr inbounds i32, i32* %32, i64 %20
-  store i32 %31, i32* %33, align 4, !tbaa !13
-  %34 = add nuw i64 %20, 1
-  %35 = ptrtoint %struct.Point* %28 to i64
-  %36 = ptrtoint %struct.Point* %27 to i64
-  %37 = sub i64 %35, %36
-  %38 = ashr exact i64 %37, 4
-  %39 = icmp ult i64 %34, %38
-  br i1 %39, label %15, label %22, !llvm.loop !15
+25:                                               ; preds = %22, %15
+  %26 = phi %struct.Point* [ %16, %15 ], [ %24, %22 ]
+  %27 = phi %struct.Point* [ %17, %15 ], [ %23, %22 ]
+  %28 = phi %struct.Point* [ %18, %15 ], [ %62, %22 ]
+  %29 = phi %struct.Point* [ %18, %15 ], [ %61, %22 ]
+  %30 = phi i32 [ 0, %15 ], [ %59, %22 ]
+  %31 = load i32*, i32** %12, align 8, !tbaa !11
+  %32 = getelementptr inbounds i32, i32* %31, i64 %20
+  store i32 %30, i32* %32, align 4, !tbaa !13
+  %33 = add nuw i64 %20, 1
+  %34 = ptrtoint %struct.Point* %27 to i64
+  %35 = ptrtoint %struct.Point* %26 to i64
+  %36 = sub i64 %34, %35
+  %37 = ashr exact i64 %36, 4
+  %38 = icmp ult i64 %33, %37
+  br i1 %38, label %15, label %.loopexit, !llvm.loop !15
 
-40:                                               ; preds = %15, %70
-  %41 = phi %struct.Point* [ %72, %70 ], [ %16, %15 ]
-  %42 = phi %struct.Point* [ %64, %70 ], [ %18, %15 ]
-  %43 = phi double [ %71, %70 ], [ 0x7FEFFFFFFFFFFFFF, %15 ]
-  %44 = phi i32 [ %61, %70 ], [ 0, %15 ]
-  %45 = phi i64 [ %62, %70 ], [ 0, %15 ]
-  %46 = getelementptr inbounds %struct.Point, %struct.Point* %41, i64 %20, i32 0
-  %47 = load double, double* %46, align 8, !tbaa.struct !17
-  %48 = getelementptr inbounds %struct.Point, %struct.Point* %41, i64 %20, i32 1
-  %49 = load double, double* %48, align 8, !tbaa.struct !20
-  %50 = getelementptr inbounds %struct.Point, %struct.Point* %42, i64 %45, i32 0
-  %51 = load double, double* %50, align 8, !tbaa.struct !17
-  %52 = getelementptr inbounds %struct.Point, %struct.Point* %42, i64 %45, i32 1
-  %53 = load double, double* %52, align 8, !tbaa.struct !20
-  %54 = fsub double %47, %51
-  %55 = fsub double %49, %53
-  %56 = fmul double %55, %55
-  %57 = tail call double @llvm.fmuladd.f64(double %54, double %54, double %56) #17
-  %58 = tail call double @sqrt(double noundef %57) #17
-  %59 = fcmp olt double %58, %43
-  %60 = trunc i64 %45 to i32
-  %61 = select i1 %59, i32 %60, i32 %44
-  %62 = add nuw i64 %45, 1
-  %63 = load %struct.Point*, %struct.Point** %10, align 8, !tbaa !5
-  %64 = load %struct.Point*, %struct.Point** %11, align 8, !tbaa !10
-  %65 = ptrtoint %struct.Point* %63 to i64
-  %66 = ptrtoint %struct.Point* %64 to i64
-  %67 = sub i64 %65, %66
-  %68 = ashr exact i64 %67, 4
-  %69 = icmp ult i64 %62, %68
-  br i1 %69, label %70, label %23, !llvm.loop !21
+.preheader:                                       ; preds = %15, %68
+  %39 = phi %struct.Point* [ %70, %68 ], [ %16, %15 ]
+  %40 = phi %struct.Point* [ %62, %68 ], [ %18, %15 ]
+  %41 = phi double [ %69, %68 ], [ 0x7FEFFFFFFFFFFFFF, %15 ]
+  %42 = phi i32 [ %59, %68 ], [ 0, %15 ]
+  %43 = phi i64 [ %60, %68 ], [ 0, %15 ]
+  %44 = getelementptr inbounds %struct.Point, %struct.Point* %39, i64 %20, i32 0
+  %45 = load double, double* %44, align 8, !tbaa.struct !17
+  %46 = getelementptr inbounds %struct.Point, %struct.Point* %39, i64 %20, i32 1
+  %47 = load double, double* %46, align 8, !tbaa.struct !20
+  %48 = getelementptr inbounds %struct.Point, %struct.Point* %40, i64 %43, i32 0
+  %49 = load double, double* %48, align 8, !tbaa.struct !17
+  %50 = getelementptr inbounds %struct.Point, %struct.Point* %40, i64 %43, i32 1
+  %51 = load double, double* %50, align 8, !tbaa.struct !20
+  %52 = fsub double %45, %49
+  %53 = fsub double %47, %51
+  %54 = fmul double %53, %53
+  %55 = tail call double @llvm.fmuladd.f64(double %52, double %52, double %54) #16
+  %56 = tail call double @sqrt(double noundef %55) #16
+  %57 = fcmp olt double %56, %41
+  %58 = trunc i64 %43 to i32
+  %59 = select i1 %57, i32 %58, i32 %42
+  %60 = add nuw i64 %43, 1
+  %61 = load %struct.Point*, %struct.Point** %10, align 8, !tbaa !5
+  %62 = load %struct.Point*, %struct.Point** %11, align 8, !tbaa !10
+  %63 = ptrtoint %struct.Point* %61 to i64
+  %64 = ptrtoint %struct.Point* %62 to i64
+  %65 = sub i64 %63, %64
+  %66 = ashr exact i64 %65, 4
+  %67 = icmp ult i64 %60, %66
+  br i1 %67, label %68, label %22, !llvm.loop !21
 
-70:                                               ; preds = %40
-  %71 = select i1 %59, double %58, double %43
-  %72 = load %struct.Point*, %struct.Point** %5, align 8, !tbaa !10
-  br label %40
+68:                                               ; preds = %.preheader
+  %69 = select i1 %57, double %56, double %41
+  %70 = load %struct.Point*, %struct.Point** %5, align 8, !tbaa !10
+  br label %.preheader
 }
 
 ; Function Attrs: argmemonly mustprogress nofree nosync nounwind willreturn
@@ -168,7 +168,7 @@ declare void @llvm.lifetime.end.p0i8(i64 immarg, i8* nocapture) #7
 define dso_local void @_Z15updateCentroidsRKSt6vectorI5PointSaIS0_EERKS_IiSaIiEERS2_(%"class.std::vector"* nocapture noundef nonnull readonly align 8 dereferenceable(24) %0, %"class.std::vector.0"* nocapture noundef nonnull readonly align 8 dereferenceable(24) %1, %"class.std::vector"* noundef nonnull align 8 dereferenceable(24) %2) local_unnamed_addr #9 personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) {
   %4 = alloca %"class.std::vector", align 8
   %5 = bitcast %"class.std::vector"* %4 to i8*
-  call void @llvm.lifetime.start.p0i8(i64 24, i8* nonnull %5) #17
+  call void @llvm.lifetime.start.p0i8(i64 24, i8* nonnull %5) #16
   %6 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %2, i64 0, i32 0, i32 0, i32 0, i32 1
   %7 = load %struct.Point*, %struct.Point** %6, align 8, !tbaa !5
   %8 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %2, i64 0, i32 0, i32 0, i32 0, i32 0
@@ -181,339 +181,325 @@ define dso_local void @_Z15updateCentroidsRKSt6vectorI5PointSaIS0_EERKS_IiSaIiEE
   br i1 %14, label %15, label %16
 
 15:                                               ; preds = %3
-  tail call void @_ZSt20__throw_length_errorPKc(i8* noundef getelementptr inbounds ([49 x i8], [49 x i8]* @.str.4, i64 0, i64 0)) #18
+  tail call void @_ZSt20__throw_length_errorPKc(i8* noundef getelementptr inbounds ([49 x i8], [49 x i8]* @.str.4, i64 0, i64 0)) #17
   unreachable
 
 16:                                               ; preds = %3
   %17 = icmp eq i64 %12, 0
-  br i1 %17, label %18, label %20
+  br i1 %17, label %18, label %19
 
 18:                                               ; preds = %16
-  %19 = bitcast %"class.std::vector"* %4 to i8*
-  call void @llvm.memset.p0i8.i64(i8* noundef nonnull align 8 dereferenceable(24) %19, i8 0, i64 24, i1 false)
-  br label %45
+  call void @llvm.memset.p0i8.i64(i8* noundef nonnull align 8 dereferenceable(24) %5, i8 0, i64 24, i1 false)
+  br label %43
 
-20:                                               ; preds = %16
-  %21 = tail call noalias noundef nonnull i8* @_Znwm(i64 noundef %12) #19
-  %22 = bitcast i8* %21 to %struct.Point*
-  %23 = bitcast %"class.std::vector"* %4 to i8**
-  store i8* %21, i8** %23, align 8, !tbaa !10
-  %24 = getelementptr inbounds %struct.Point, %struct.Point* %22, i64 %13
-  %25 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %4, i64 0, i32 0, i32 0, i32 0, i32 2
-  store %struct.Point* %24, %struct.Point** %25, align 8, !tbaa !22
-  %26 = and i64 %12, -16
-  call void @llvm.memset.p0i8.i64(i8* nonnull align 8 %21, i8 0, i64 %26, i1 false)
-  %27 = load %struct.Point*, %struct.Point** %6, align 8, !tbaa !5
-  %28 = load %struct.Point*, %struct.Point** %8, align 8, !tbaa !10
+19:                                               ; preds = %16
+  %20 = tail call noalias noundef nonnull i8* @_Znwm(i64 noundef %12) #18
+  %21 = bitcast i8* %20 to %struct.Point*
+  %22 = bitcast %"class.std::vector"* %4 to i8**
+  store i8* %20, i8** %22, align 8, !tbaa !10
+  %23 = getelementptr inbounds %struct.Point, %struct.Point* %21, i64 %13
+  %24 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %4, i64 0, i32 0, i32 0, i32 0, i32 2
+  store %struct.Point* %23, %struct.Point** %24, align 8, !tbaa !22
+  %25 = and i64 %12, -16
+  tail call void @llvm.memset.p0i8.i64(i8* nonnull align 8 %20, i8 0, i64 %25, i1 false)
+  %26 = load %struct.Point*, %struct.Point** %6, align 8, !tbaa !5
+  %27 = load %struct.Point*, %struct.Point** %8, align 8, !tbaa !10
+  %28 = ptrtoint %struct.Point* %26 to i64
   %29 = ptrtoint %struct.Point* %27 to i64
-  %30 = ptrtoint %struct.Point* %28 to i64
-  %31 = sub i64 %29, %30
-  %32 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %4, i64 0, i32 0, i32 0, i32 0, i32 1
-  store %struct.Point* %24, %struct.Point** %32, align 8, !tbaa !5
-  %33 = icmp slt i64 %31, 0
-  br i1 %33, label %34, label %36
+  %30 = sub i64 %28, %29
+  %31 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %4, i64 0, i32 0, i32 0, i32 0, i32 1
+  store %struct.Point* %23, %struct.Point** %31, align 8, !tbaa !5
+  %32 = icmp slt i64 %30, 0
+  br i1 %32, label %33, label %35
 
-34:                                               ; preds = %20
-  invoke void @_ZSt20__throw_length_errorPKc(i8* noundef getelementptr inbounds ([49 x i8], [49 x i8]* @.str.4, i64 0, i64 0)) #18
-          to label %35 unwind label %103
+33:                                               ; preds = %19
+  invoke void @_ZSt20__throw_length_errorPKc(i8* noundef getelementptr inbounds ([49 x i8], [49 x i8]* @.str.4, i64 0, i64 0)) #17
+          to label %34 unwind label %97
 
-35:                                               ; preds = %34
+34:                                               ; preds = %33
   unreachable
 
-36:                                               ; preds = %20
-  %37 = icmp eq i64 %31, 0
-  br i1 %37, label %45, label %38
+35:                                               ; preds = %19
+  %36 = icmp eq i64 %30, 0
+  br i1 %36, label %43, label %37
 
-38:                                               ; preds = %36
-  %39 = lshr exact i64 %31, 2
-  %40 = invoke noalias noundef nonnull i8* @_Znwm(i64 noundef %39) #19
-          to label %41 unwind label %103
+37:                                               ; preds = %35
+  %38 = lshr exact i64 %30, 2
+  %39 = invoke noalias noundef nonnull i8* @_Znwm(i64 noundef %38) #18
+          to label %40 unwind label %97
 
-41:                                               ; preds = %38
-  %42 = bitcast i8* %40 to i32*
-  %43 = lshr i64 %31, 2
-  %44 = and i64 %43, 4611686018427387900
-  call void @llvm.memset.p0i8.i64(i8* nonnull align 4 %40, i8 0, i64 %44, i1 false), !tbaa !13
-  br label %45
+40:                                               ; preds = %37
+  %41 = bitcast i8* %39 to i32*
+  %42 = and i64 %38, 4611686018427387900
+  tail call void @llvm.memset.p0i8.i64(i8* nonnull align 4 %39, i8 0, i64 %42, i1 false), !tbaa !13
+  br label %43
 
-45:                                               ; preds = %18, %41, %36
-  %46 = phi %struct.Point* [ %22, %36 ], [ %22, %41 ], [ null, %18 ]
-  %47 = phi i32* [ null, %36 ], [ %42, %41 ], [ null, %18 ]
-  %48 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %0, i64 0, i32 0, i32 0, i32 0, i32 1
-  %49 = load %struct.Point*, %struct.Point** %48, align 8, !tbaa !5
-  %50 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %0, i64 0, i32 0, i32 0, i32 0, i32 0
-  %51 = load %struct.Point*, %struct.Point** %50, align 8, !tbaa !10
-  %52 = ptrtoint %struct.Point* %49 to i64
-  %53 = ptrtoint %struct.Point* %51 to i64
-  %54 = sub i64 %52, %53
-  %55 = icmp eq i64 %54, 0
-  br i1 %55, label %89, label %56
+43:                                               ; preds = %40, %35, %18
+  %44 = phi %struct.Point* [ %21, %35 ], [ %21, %40 ], [ null, %18 ]
+  %45 = phi i32* [ null, %35 ], [ %41, %40 ], [ null, %18 ]
+  %46 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %0, i64 0, i32 0, i32 0, i32 0, i32 1
+  %47 = load %struct.Point*, %struct.Point** %46, align 8, !tbaa !5
+  %48 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %0, i64 0, i32 0, i32 0, i32 0, i32 0
+  %49 = load %struct.Point*, %struct.Point** %48, align 8, !tbaa !10
+  %50 = ptrtoint %struct.Point* %47 to i64
+  %51 = ptrtoint %struct.Point* %49 to i64
+  %52 = sub i64 %50, %51
+  %53 = icmp eq i64 %52, 0
+  br i1 %53, label %.loopexit11, label %54
 
-56:                                               ; preds = %45
-  %57 = ashr i64 %54, 4
-  %58 = getelementptr inbounds %"class.std::vector.0", %"class.std::vector.0"* %1, i64 0, i32 0, i32 0, i32 0, i32 0
-  %59 = load i32*, i32** %58, align 8, !tbaa !11
-  %60 = call i64 @llvm.umax.i64(i64 %57, i64 1)
-  %61 = add i64 %60, -1
-  %62 = and i64 %60, 3
-  %63 = icmp ult i64 %61, 3
-  br i1 %63, label %66, label %64
+54:                                               ; preds = %43
+  %55 = ashr i64 %52, 4
+  %56 = getelementptr inbounds %"class.std::vector.0", %"class.std::vector.0"* %1, i64 0, i32 0, i32 0, i32 0, i32 0
+  %57 = load i32*, i32** %56, align 8, !tbaa !11
+  %58 = tail call i64 @llvm.umax.i64(i64 %55, i64 1)
+  %59 = add i64 %58, -1
+  %60 = and i64 %58, 3
+  %61 = icmp ult i64 %59, 3
+  br i1 %61, label %.loopexit12, label %62
 
-64:                                               ; preds = %56
-  %65 = and i64 %60, -4
-  br label %105
+62:                                               ; preds = %54
+  %63 = and i64 %58, -4
+  br label %99
 
-66:                                               ; preds = %105, %56
-  %67 = phi i64 [ 0, %56 ], [ %167, %105 ]
-  %68 = icmp eq i64 %62, 0
-  br i1 %68, label %89, label %69
+.loopexit12:                                      ; preds = %99, %54
+  %64 = phi i64 [ 0, %54 ], [ %63, %99 ]
+  %65 = icmp eq i64 %60, 0
+  br i1 %65, label %.loopexit11, label %.preheader
 
-69:                                               ; preds = %66, %69
-  %70 = phi i64 [ %86, %69 ], [ %67, %66 ]
-  %71 = phi i64 [ %87, %69 ], [ 0, %66 ]
-  %72 = getelementptr inbounds i32, i32* %59, i64 %70
-  %73 = load i32, i32* %72, align 4, !tbaa !13
-  %74 = getelementptr inbounds %struct.Point, %struct.Point* %51, i64 %70, i32 0
-  %75 = sext i32 %73 to i64
-  %76 = getelementptr inbounds %struct.Point, %struct.Point* %46, i64 %75, i32 0
-  %77 = bitcast double* %74 to <2 x double>*
-  %78 = load <2 x double>, <2 x double>* %77, align 8, !tbaa !18
-  %79 = bitcast double* %76 to <2 x double>*
-  %80 = load <2 x double>, <2 x double>* %79, align 8, !tbaa !18
-  %81 = fadd <2 x double> %78, %80
-  %82 = bitcast double* %76 to <2 x double>*
-  store <2 x double> %81, <2 x double>* %82, align 8, !tbaa !18
-  %83 = getelementptr inbounds i32, i32* %47, i64 %75
-  %84 = load i32, i32* %83, align 4, !tbaa !13
-  %85 = add nsw i32 %84, 1
-  store i32 %85, i32* %83, align 4, !tbaa !13
-  %86 = add nuw i64 %70, 1
-  %87 = add i64 %71, 1
-  %88 = icmp eq i64 %87, %62
-  br i1 %88, label %89, label %69, !llvm.loop !23
+.preheader:                                       ; preds = %.loopexit12, %.preheader
+  %66 = phi i64 [ %81, %.preheader ], [ %64, %.loopexit12 ]
+  %67 = phi i64 [ %82, %.preheader ], [ 0, %.loopexit12 ]
+  %68 = getelementptr inbounds i32, i32* %57, i64 %66
+  %69 = load i32, i32* %68, align 4, !tbaa !13
+  %70 = getelementptr inbounds %struct.Point, %struct.Point* %49, i64 %66, i32 0
+  %71 = sext i32 %69 to i64
+  %72 = getelementptr inbounds %struct.Point, %struct.Point* %44, i64 %71, i32 0
+  %73 = bitcast double* %70 to <2 x double>*
+  %74 = load <2 x double>, <2 x double>* %73, align 8, !tbaa !18
+  %75 = bitcast double* %72 to <2 x double>*
+  %76 = load <2 x double>, <2 x double>* %75, align 8, !tbaa !18
+  %77 = fadd <2 x double> %74, %76
+  store <2 x double> %77, <2 x double>* %75, align 8, !tbaa !18
+  %78 = getelementptr inbounds i32, i32* %45, i64 %71
+  %79 = load i32, i32* %78, align 4, !tbaa !13
+  %80 = add nsw i32 %79, 1
+  store i32 %80, i32* %78, align 4, !tbaa !13
+  %81 = add nuw nsw i64 %66, 1
+  %82 = add nuw nsw i64 %67, 1
+  %83 = icmp eq i64 %82, %60
+  br i1 %83, label %.loopexit11, label %.preheader, !llvm.loop !23
 
-89:                                               ; preds = %66, %69, %45
-  %90 = load %struct.Point*, %struct.Point** %6, align 8, !tbaa !5
-  %91 = load %struct.Point*, %struct.Point** %8, align 8, !tbaa !10
-  %92 = ptrtoint %struct.Point* %90 to i64
-  %93 = ptrtoint %struct.Point* %91 to i64
-  %94 = sub i64 %92, %93
-  %95 = icmp eq i64 %94, 0
-  br i1 %95, label %186, label %96
+.loopexit11:                                      ; preds = %.preheader, %.loopexit12, %43
+  %84 = load %struct.Point*, %struct.Point** %6, align 8, !tbaa !5
+  %85 = load %struct.Point*, %struct.Point** %8, align 8, !tbaa !10
+  %86 = ptrtoint %struct.Point* %84 to i64
+  %87 = ptrtoint %struct.Point* %85 to i64
+  %88 = sub i64 %86, %87
+  %89 = icmp eq i64 %88, 0
+  br i1 %89, label %172, label %90
 
-96:                                               ; preds = %89
-  %97 = ashr i64 %94, 4
-  %98 = call i64 @llvm.umax.i64(i64 %97, i64 1)
-  %99 = and i64 %98, 1
-  %100 = icmp ult i64 %94, 32
-  br i1 %100, label %170, label %101
+90:                                               ; preds = %.loopexit11
+  %91 = ashr i64 %88, 4
+  %92 = tail call i64 @llvm.umax.i64(i64 %91, i64 1)
+  %93 = and i64 %92, 1
+  %94 = icmp ult i64 %88, 32
+  br i1 %94, label %.loopexit, label %95
 
-101:                                              ; preds = %96
-  %102 = and i64 %98, -2
-  br label %188
+95:                                               ; preds = %90
+  %96 = and i64 %92, -2
+  br label %174
 
-103:                                              ; preds = %38, %34
-  %104 = landingpad { i8*, i32 }
+97:                                               ; preds = %37, %33
+  %98 = landingpad { i8*, i32 }
           cleanup
-  br label %237
+  br label %219
 
-105:                                              ; preds = %105, %64
-  %106 = phi i64 [ 0, %64 ], [ %167, %105 ]
-  %107 = phi i64 [ 0, %64 ], [ %168, %105 ]
-  %108 = getelementptr inbounds i32, i32* %59, i64 %106
-  %109 = load i32, i32* %108, align 4, !tbaa !13
-  %110 = getelementptr inbounds %struct.Point, %struct.Point* %51, i64 %106, i32 0
-  %111 = sext i32 %109 to i64
-  %112 = getelementptr inbounds %struct.Point, %struct.Point* %46, i64 %111, i32 0
-  %113 = bitcast double* %110 to <2 x double>*
-  %114 = load <2 x double>, <2 x double>* %113, align 8, !tbaa !18
-  %115 = bitcast double* %112 to <2 x double>*
-  %116 = load <2 x double>, <2 x double>* %115, align 8, !tbaa !18
-  %117 = fadd <2 x double> %114, %116
-  %118 = bitcast double* %112 to <2 x double>*
-  store <2 x double> %117, <2 x double>* %118, align 8, !tbaa !18
-  %119 = getelementptr inbounds i32, i32* %47, i64 %111
-  %120 = load i32, i32* %119, align 4, !tbaa !13
-  %121 = add nsw i32 %120, 1
-  store i32 %121, i32* %119, align 4, !tbaa !13
-  %122 = or i64 %106, 1
-  %123 = getelementptr inbounds i32, i32* %59, i64 %122
-  %124 = load i32, i32* %123, align 4, !tbaa !13
-  %125 = getelementptr inbounds %struct.Point, %struct.Point* %51, i64 %122, i32 0
-  %126 = sext i32 %124 to i64
-  %127 = getelementptr inbounds %struct.Point, %struct.Point* %46, i64 %126, i32 0
-  %128 = bitcast double* %125 to <2 x double>*
-  %129 = load <2 x double>, <2 x double>* %128, align 8, !tbaa !18
-  %130 = bitcast double* %127 to <2 x double>*
-  %131 = load <2 x double>, <2 x double>* %130, align 8, !tbaa !18
-  %132 = fadd <2 x double> %129, %131
-  %133 = bitcast double* %127 to <2 x double>*
-  store <2 x double> %132, <2 x double>* %133, align 8, !tbaa !18
-  %134 = getelementptr inbounds i32, i32* %47, i64 %126
-  %135 = load i32, i32* %134, align 4, !tbaa !13
-  %136 = add nsw i32 %135, 1
-  store i32 %136, i32* %134, align 4, !tbaa !13
-  %137 = or i64 %106, 2
-  %138 = getelementptr inbounds i32, i32* %59, i64 %137
-  %139 = load i32, i32* %138, align 4, !tbaa !13
-  %140 = getelementptr inbounds %struct.Point, %struct.Point* %51, i64 %137, i32 0
-  %141 = sext i32 %139 to i64
-  %142 = getelementptr inbounds %struct.Point, %struct.Point* %46, i64 %141, i32 0
-  %143 = bitcast double* %140 to <2 x double>*
-  %144 = load <2 x double>, <2 x double>* %143, align 8, !tbaa !18
-  %145 = bitcast double* %142 to <2 x double>*
-  %146 = load <2 x double>, <2 x double>* %145, align 8, !tbaa !18
-  %147 = fadd <2 x double> %144, %146
-  %148 = bitcast double* %142 to <2 x double>*
-  store <2 x double> %147, <2 x double>* %148, align 8, !tbaa !18
-  %149 = getelementptr inbounds i32, i32* %47, i64 %141
-  %150 = load i32, i32* %149, align 4, !tbaa !13
-  %151 = add nsw i32 %150, 1
-  store i32 %151, i32* %149, align 4, !tbaa !13
-  %152 = or i64 %106, 3
-  %153 = getelementptr inbounds i32, i32* %59, i64 %152
+99:                                               ; preds = %99, %62
+  %100 = phi i64 [ 0, %62 ], [ %156, %99 ]
+  %101 = getelementptr inbounds i32, i32* %57, i64 %100
+  %102 = load i32, i32* %101, align 4, !tbaa !13
+  %103 = getelementptr inbounds %struct.Point, %struct.Point* %49, i64 %100, i32 0
+  %104 = sext i32 %102 to i64
+  %105 = getelementptr inbounds %struct.Point, %struct.Point* %44, i64 %104, i32 0
+  %106 = bitcast double* %103 to <2 x double>*
+  %107 = load <2 x double>, <2 x double>* %106, align 8, !tbaa !18
+  %108 = bitcast double* %105 to <2 x double>*
+  %109 = load <2 x double>, <2 x double>* %108, align 8, !tbaa !18
+  %110 = fadd <2 x double> %107, %109
+  store <2 x double> %110, <2 x double>* %108, align 8, !tbaa !18
+  %111 = getelementptr inbounds i32, i32* %45, i64 %104
+  %112 = load i32, i32* %111, align 4, !tbaa !13
+  %113 = add nsw i32 %112, 1
+  store i32 %113, i32* %111, align 4, !tbaa !13
+  %114 = or i64 %100, 1
+  %115 = getelementptr inbounds i32, i32* %57, i64 %114
+  %116 = load i32, i32* %115, align 4, !tbaa !13
+  %117 = getelementptr inbounds %struct.Point, %struct.Point* %49, i64 %114, i32 0
+  %118 = sext i32 %116 to i64
+  %119 = getelementptr inbounds %struct.Point, %struct.Point* %44, i64 %118, i32 0
+  %120 = bitcast double* %117 to <2 x double>*
+  %121 = load <2 x double>, <2 x double>* %120, align 8, !tbaa !18
+  %122 = bitcast double* %119 to <2 x double>*
+  %123 = load <2 x double>, <2 x double>* %122, align 8, !tbaa !18
+  %124 = fadd <2 x double> %121, %123
+  store <2 x double> %124, <2 x double>* %122, align 8, !tbaa !18
+  %125 = getelementptr inbounds i32, i32* %45, i64 %118
+  %126 = load i32, i32* %125, align 4, !tbaa !13
+  %127 = add nsw i32 %126, 1
+  store i32 %127, i32* %125, align 4, !tbaa !13
+  %128 = or i64 %100, 2
+  %129 = getelementptr inbounds i32, i32* %57, i64 %128
+  %130 = load i32, i32* %129, align 4, !tbaa !13
+  %131 = getelementptr inbounds %struct.Point, %struct.Point* %49, i64 %128, i32 0
+  %132 = sext i32 %130 to i64
+  %133 = getelementptr inbounds %struct.Point, %struct.Point* %44, i64 %132, i32 0
+  %134 = bitcast double* %131 to <2 x double>*
+  %135 = load <2 x double>, <2 x double>* %134, align 8, !tbaa !18
+  %136 = bitcast double* %133 to <2 x double>*
+  %137 = load <2 x double>, <2 x double>* %136, align 8, !tbaa !18
+  %138 = fadd <2 x double> %135, %137
+  store <2 x double> %138, <2 x double>* %136, align 8, !tbaa !18
+  %139 = getelementptr inbounds i32, i32* %45, i64 %132
+  %140 = load i32, i32* %139, align 4, !tbaa !13
+  %141 = add nsw i32 %140, 1
+  store i32 %141, i32* %139, align 4, !tbaa !13
+  %142 = or i64 %100, 3
+  %143 = getelementptr inbounds i32, i32* %57, i64 %142
+  %144 = load i32, i32* %143, align 4, !tbaa !13
+  %145 = getelementptr inbounds %struct.Point, %struct.Point* %49, i64 %142, i32 0
+  %146 = sext i32 %144 to i64
+  %147 = getelementptr inbounds %struct.Point, %struct.Point* %44, i64 %146, i32 0
+  %148 = bitcast double* %145 to <2 x double>*
+  %149 = load <2 x double>, <2 x double>* %148, align 8, !tbaa !18
+  %150 = bitcast double* %147 to <2 x double>*
+  %151 = load <2 x double>, <2 x double>* %150, align 8, !tbaa !18
+  %152 = fadd <2 x double> %149, %151
+  store <2 x double> %152, <2 x double>* %150, align 8, !tbaa !18
+  %153 = getelementptr inbounds i32, i32* %45, i64 %146
   %154 = load i32, i32* %153, align 4, !tbaa !13
-  %155 = getelementptr inbounds %struct.Point, %struct.Point* %51, i64 %152, i32 0
-  %156 = sext i32 %154 to i64
-  %157 = getelementptr inbounds %struct.Point, %struct.Point* %46, i64 %156, i32 0
-  %158 = bitcast double* %155 to <2 x double>*
-  %159 = load <2 x double>, <2 x double>* %158, align 8, !tbaa !18
-  %160 = bitcast double* %157 to <2 x double>*
-  %161 = load <2 x double>, <2 x double>* %160, align 8, !tbaa !18
-  %162 = fadd <2 x double> %159, %161
-  %163 = bitcast double* %157 to <2 x double>*
-  store <2 x double> %162, <2 x double>* %163, align 8, !tbaa !18
-  %164 = getelementptr inbounds i32, i32* %47, i64 %156
-  %165 = load i32, i32* %164, align 4, !tbaa !13
-  %166 = add nsw i32 %165, 1
-  store i32 %166, i32* %164, align 4, !tbaa !13
-  %167 = add nuw i64 %106, 4
-  %168 = add i64 %107, 4
-  %169 = icmp eq i64 %168, %65
-  br i1 %169, label %66, label %105, !llvm.loop !25
+  %155 = add nsw i32 %154, 1
+  store i32 %155, i32* %153, align 4, !tbaa !13
+  %156 = add nuw i64 %100, 4
+  %157 = icmp eq i64 %156, %63
+  br i1 %157, label %.loopexit12, label %99, !llvm.loop !25
 
-170:                                              ; preds = %217, %96
-  %171 = phi i64 [ 0, %96 ], [ %218, %217 ]
-  %172 = icmp eq i64 %99, 0
-  br i1 %172, label %186, label %173
+.loopexit:                                        ; preds = %200, %90
+  %158 = phi i64 [ 0, %90 ], [ %96, %200 ]
+  %159 = icmp eq i64 %93, 0
+  br i1 %159, label %172, label %160
 
-173:                                              ; preds = %170
-  %174 = getelementptr inbounds i32, i32* %47, i64 %171
-  %175 = load i32, i32* %174, align 4, !tbaa !13
-  %176 = icmp sgt i32 %175, 0
-  br i1 %176, label %177, label %186
+160:                                              ; preds = %.loopexit
+  %161 = getelementptr inbounds i32, i32* %45, i64 %158
+  %162 = load i32, i32* %161, align 4, !tbaa !13
+  %163 = icmp sgt i32 %162, 0
+  br i1 %163, label %164, label %172
 
-177:                                              ; preds = %173
-  %178 = sitofp i32 %175 to double
-  %179 = getelementptr inbounds %struct.Point, %struct.Point* %46, i64 %171, i32 0
-  %180 = bitcast double* %179 to <2 x double>*
-  %181 = load <2 x double>, <2 x double>* %180, align 8, !tbaa !18
-  %182 = insertelement <2 x double> poison, double %178, i64 0
-  %183 = shufflevector <2 x double> %182, <2 x double> poison, <2 x i32> zeroinitializer
-  %184 = fdiv <2 x double> %181, %183
-  %185 = bitcast double* %179 to <2 x double>*
-  store <2 x double> %184, <2 x double>* %185, align 8, !tbaa !18
-  br label %186
+164:                                              ; preds = %160
+  %165 = sitofp i32 %162 to double
+  %166 = getelementptr inbounds %struct.Point, %struct.Point* %44, i64 %158, i32 0
+  %167 = bitcast double* %166 to <2 x double>*
+  %168 = load <2 x double>, <2 x double>* %167, align 8, !tbaa !18
+  %169 = insertelement <2 x double> poison, double %165, i64 0
+  %170 = shufflevector <2 x double> %169, <2 x double> poison, <2 x i32> zeroinitializer
+  %171 = fdiv <2 x double> %168, %170
+  store <2 x double> %171, <2 x double>* %167, align 8, !tbaa !18
+  br label %172
 
-186:                                              ; preds = %170, %177, %173, %89
-  %187 = invoke noundef nonnull align 8 dereferenceable(24) %"class.std::vector"* @_ZNSt6vectorI5PointSaIS0_EEaSERKS2_(%"class.std::vector"* noundef nonnull align 8 dereferenceable(24) %2, %"class.std::vector"* noundef nonnull align 8 dereferenceable(24) %4)
-          to label %221 unwind label %232
+172:                                              ; preds = %164, %160, %.loopexit, %.loopexit11
+  %173 = invoke noundef nonnull align 8 dereferenceable(24) %"class.std::vector"* @_ZNSt6vectorI5PointSaIS0_EEaSERKS2_(%"class.std::vector"* noundef nonnull align 8 dereferenceable(24) %2, %"class.std::vector"* noundef nonnull align 8 dereferenceable(24) %4)
+          to label %203 unwind label %214
 
-188:                                              ; preds = %217, %101
-  %189 = phi i64 [ 0, %101 ], [ %218, %217 ]
-  %190 = phi i64 [ 0, %101 ], [ %219, %217 ]
-  %191 = getelementptr inbounds i32, i32* %47, i64 %189
-  %192 = load i32, i32* %191, align 4, !tbaa !13
-  %193 = icmp sgt i32 %192, 0
-  br i1 %193, label %194, label %203
+174:                                              ; preds = %200, %95
+  %175 = phi i64 [ 0, %95 ], [ %201, %200 ]
+  %176 = getelementptr inbounds i32, i32* %45, i64 %175
+  %177 = load i32, i32* %176, align 4, !tbaa !13
+  %178 = icmp sgt i32 %177, 0
+  br i1 %178, label %179, label %187
 
-194:                                              ; preds = %188
-  %195 = sitofp i32 %192 to double
-  %196 = getelementptr inbounds %struct.Point, %struct.Point* %46, i64 %189, i32 0
-  %197 = bitcast double* %196 to <2 x double>*
-  %198 = load <2 x double>, <2 x double>* %197, align 8, !tbaa !18
-  %199 = insertelement <2 x double> poison, double %195, i64 0
-  %200 = shufflevector <2 x double> %199, <2 x double> poison, <2 x i32> zeroinitializer
-  %201 = fdiv <2 x double> %198, %200
-  %202 = bitcast double* %196 to <2 x double>*
-  store <2 x double> %201, <2 x double>* %202, align 8, !tbaa !18
-  br label %203
+179:                                              ; preds = %174
+  %180 = sitofp i32 %177 to double
+  %181 = getelementptr inbounds %struct.Point, %struct.Point* %44, i64 %175, i32 0
+  %182 = bitcast double* %181 to <2 x double>*
+  %183 = load <2 x double>, <2 x double>* %182, align 8, !tbaa !18
+  %184 = insertelement <2 x double> poison, double %180, i64 0
+  %185 = shufflevector <2 x double> %184, <2 x double> poison, <2 x i32> zeroinitializer
+  %186 = fdiv <2 x double> %183, %185
+  store <2 x double> %186, <2 x double>* %182, align 8, !tbaa !18
+  br label %187
 
-203:                                              ; preds = %188, %194
-  %204 = or i64 %189, 1
-  %205 = getelementptr inbounds i32, i32* %47, i64 %204
-  %206 = load i32, i32* %205, align 4, !tbaa !13
-  %207 = icmp sgt i32 %206, 0
-  br i1 %207, label %208, label %217
+187:                                              ; preds = %179, %174
+  %188 = or i64 %175, 1
+  %189 = getelementptr inbounds i32, i32* %45, i64 %188
+  %190 = load i32, i32* %189, align 4, !tbaa !13
+  %191 = icmp sgt i32 %190, 0
+  br i1 %191, label %192, label %200
 
-208:                                              ; preds = %203
-  %209 = sitofp i32 %206 to double
-  %210 = getelementptr inbounds %struct.Point, %struct.Point* %46, i64 %204, i32 0
-  %211 = bitcast double* %210 to <2 x double>*
-  %212 = load <2 x double>, <2 x double>* %211, align 8, !tbaa !18
-  %213 = insertelement <2 x double> poison, double %209, i64 0
-  %214 = shufflevector <2 x double> %213, <2 x double> poison, <2 x i32> zeroinitializer
-  %215 = fdiv <2 x double> %212, %214
-  %216 = bitcast double* %210 to <2 x double>*
-  store <2 x double> %215, <2 x double>* %216, align 8, !tbaa !18
-  br label %217
+192:                                              ; preds = %187
+  %193 = sitofp i32 %190 to double
+  %194 = getelementptr inbounds %struct.Point, %struct.Point* %44, i64 %188, i32 0
+  %195 = bitcast double* %194 to <2 x double>*
+  %196 = load <2 x double>, <2 x double>* %195, align 8, !tbaa !18
+  %197 = insertelement <2 x double> poison, double %193, i64 0
+  %198 = shufflevector <2 x double> %197, <2 x double> poison, <2 x i32> zeroinitializer
+  %199 = fdiv <2 x double> %196, %198
+  store <2 x double> %199, <2 x double>* %195, align 8, !tbaa !18
+  br label %200
 
-217:                                              ; preds = %208, %203
-  %218 = add nuw i64 %189, 2
-  %219 = add i64 %190, 2
-  %220 = icmp eq i64 %219, %102
-  br i1 %220, label %170, label %188, !llvm.loop !26
+200:                                              ; preds = %192, %187
+  %201 = add nuw i64 %175, 2
+  %202 = icmp eq i64 %201, %96
+  br i1 %202, label %.loopexit, label %174, !llvm.loop !26
 
-221:                                              ; preds = %186
-  %222 = icmp eq i32* %47, null
-  br i1 %222, label %225, label %223
+203:                                              ; preds = %172
+  %204 = icmp eq i32* %45, null
+  br i1 %204, label %207, label %205
 
-223:                                              ; preds = %221
-  %224 = bitcast i32* %47 to i8*
-  call void @_ZdlPv(i8* noundef nonnull %224) #17
-  br label %225
+205:                                              ; preds = %203
+  %206 = bitcast i32* %45 to i8*
+  call void @_ZdlPv(i8* noundef nonnull %206) #16
+  br label %207
 
-225:                                              ; preds = %221, %223
-  %226 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %4, i64 0, i32 0, i32 0, i32 0, i32 0
-  %227 = load %struct.Point*, %struct.Point** %226, align 8, !tbaa !10
-  %228 = icmp eq %struct.Point* %227, null
-  br i1 %228, label %231, label %229
+207:                                              ; preds = %205, %203
+  %208 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %4, i64 0, i32 0, i32 0, i32 0, i32 0
+  %209 = load %struct.Point*, %struct.Point** %208, align 8, !tbaa !10
+  %210 = icmp eq %struct.Point* %209, null
+  br i1 %210, label %213, label %211
 
-229:                                              ; preds = %225
-  %230 = bitcast %struct.Point* %227 to i8*
-  call void @_ZdlPv(i8* noundef nonnull %230) #17
-  br label %231
+211:                                              ; preds = %207
+  %212 = bitcast %struct.Point* %209 to i8*
+  call void @_ZdlPv(i8* noundef nonnull %212) #16
+  br label %213
 
-231:                                              ; preds = %225, %229
-  call void @llvm.lifetime.end.p0i8(i64 24, i8* nonnull %5) #17
+213:                                              ; preds = %211, %207
+  call void @llvm.lifetime.end.p0i8(i64 24, i8* nonnull %5) #16
   ret void
 
-232:                                              ; preds = %186
-  %233 = landingpad { i8*, i32 }
+214:                                              ; preds = %172
+  %215 = landingpad { i8*, i32 }
           cleanup
-  %234 = icmp eq i32* %47, null
-  br i1 %234, label %237, label %235
+  %216 = icmp eq i32* %45, null
+  br i1 %216, label %219, label %217
 
-235:                                              ; preds = %232
-  %236 = bitcast i32* %47 to i8*
-  call void @_ZdlPv(i8* noundef nonnull %236) #17
-  br label %237
+217:                                              ; preds = %214
+  %218 = bitcast i32* %45 to i8*
+  call void @_ZdlPv(i8* noundef nonnull %218) #16
+  br label %219
 
-237:                                              ; preds = %235, %232, %103
-  %238 = phi { i8*, i32 } [ %104, %103 ], [ %233, %232 ], [ %233, %235 ]
-  %239 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %4, i64 0, i32 0, i32 0, i32 0, i32 0
-  %240 = load %struct.Point*, %struct.Point** %239, align 8, !tbaa !10
-  %241 = icmp eq %struct.Point* %240, null
-  br i1 %241, label %244, label %242
+219:                                              ; preds = %217, %214, %97
+  %220 = phi { i8*, i32 } [ %98, %97 ], [ %215, %214 ], [ %215, %217 ]
+  %221 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %4, i64 0, i32 0, i32 0, i32 0, i32 0
+  %222 = load %struct.Point*, %struct.Point** %221, align 8, !tbaa !10
+  %223 = icmp eq %struct.Point* %222, null
+  br i1 %223, label %226, label %224
 
-242:                                              ; preds = %237
-  %243 = bitcast %struct.Point* %240 to i8*
-  call void @_ZdlPv(i8* noundef nonnull %243) #17
-  br label %244
+224:                                              ; preds = %219
+  %225 = bitcast %struct.Point* %222 to i8*
+  call void @_ZdlPv(i8* noundef nonnull %225) #16
+  br label %226
 
-244:                                              ; preds = %242, %237
-  call void @llvm.lifetime.end.p0i8(i64 24, i8* nonnull %5) #17
-  resume { i8*, i32 } %238
+226:                                              ; preds = %224, %219
+  call void @llvm.lifetime.end.p0i8(i64 24, i8* nonnull %5) #16
+  resume { i8*, i32 } %220
 }
 
 declare i32 @__gxx_personality_v0(...)
@@ -548,31 +534,31 @@ define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(24) %"clas
   br i1 %23, label %24, label %25, !prof !27
 
 24:                                               ; preds = %22
-  tail call void @_ZSt28__throw_bad_array_new_lengthv() #18
+  tail call void @_ZSt28__throw_bad_array_new_lengthv() #17
   unreachable
 
 25:                                               ; preds = %22
-  %26 = tail call noalias noundef nonnull i8* @_Znwm(i64 noundef %11) #19
+  %26 = tail call noalias noundef nonnull i8* @_Znwm(i64 noundef %11) #18
   %27 = bitcast i8* %26 to %struct.Point*
   %28 = icmp eq i64 %11, 0
   br i1 %28, label %31, label %29
 
 29:                                               ; preds = %25
   %30 = bitcast %struct.Point* %8 to i8*
-  tail call void @llvm.memcpy.p0i8.p0i8.i64(i8* nonnull align 8 %26, i8* align 8 %30, i64 %11, i1 false) #17
+  tail call void @llvm.memcpy.p0i8.p0i8.i64(i8* nonnull align 8 %26, i8* align 8 %30, i64 %11, i1 false) #16
   br label %31
 
-31:                                               ; preds = %25, %29
+31:                                               ; preds = %29, %25
   %32 = load %struct.Point*, %struct.Point** %15, align 8, !tbaa !10
   %33 = icmp eq %struct.Point* %32, null
   br i1 %33, label %36, label %34
 
 34:                                               ; preds = %31
   %35 = bitcast %struct.Point* %32 to i8*
-  tail call void @_ZdlPv(i8* noundef nonnull %35) #17
+  tail call void @_ZdlPv(i8* noundef nonnull %35) #16
   br label %36
 
-36:                                               ; preds = %31, %34
+36:                                               ; preds = %34, %31
   %37 = bitcast %"class.std::vector"* %0 to i8**
   store i8* %26, i8** %37, align 8, !tbaa !10
   %38 = getelementptr inbounds %struct.Point, %struct.Point* %27, i64 %12
@@ -595,7 +581,7 @@ define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(24) %"clas
 48:                                               ; preds = %46
   %49 = bitcast %struct.Point* %16 to i8*
   %50 = bitcast %struct.Point* %8 to i8*
-  tail call void @llvm.memmove.p0i8.p0i8.i64(i8* align 8 %49, i8* align 8 %50, i64 %11, i1 false) #17
+  tail call void @llvm.memmove.p0i8.p0i8.i64(i8* align 8 %49, i8* align 8 %50, i64 %11, i1 false) #16
   br label %77
 
 51:                                               ; preds = %39
@@ -605,7 +591,7 @@ define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(24) %"clas
 53:                                               ; preds = %51
   %54 = bitcast %struct.Point* %16 to i8*
   %55 = bitcast %struct.Point* %8 to i8*
-  tail call void @llvm.memmove.p0i8.p0i8.i64(i8* align 8 %54, i8* align 8 %55, i64 %43, i1 false) #17
+  tail call void @llvm.memmove.p0i8.p0i8.i64(i8* align 8 %54, i8* align 8 %55, i64 %43, i1 false) #16
   %56 = load %struct.Point*, %struct.Point** %7, align 8, !tbaa !10
   %57 = load %struct.Point*, %struct.Point** %40, align 8, !tbaa !5
   %58 = load %struct.Point*, %struct.Point** %15, align 8, !tbaa !10
@@ -617,7 +603,7 @@ define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(24) %"clas
   %64 = ptrtoint %struct.Point* %59 to i64
   br label %65
 
-65:                                               ; preds = %51, %53
+65:                                               ; preds = %53, %51
   %66 = phi i64 [ %9, %51 ], [ %64, %53 ]
   %67 = phi i64 [ 0, %51 ], [ %63, %53 ]
   %68 = phi %struct.Point* [ %41, %51 ], [ %57, %53 ]
@@ -631,7 +617,7 @@ define linkonce_odr dso_local noundef nonnull align 8 dereferenceable(24) %"clas
 74:                                               ; preds = %65
   %75 = bitcast %struct.Point* %68 to i8*
   %76 = bitcast %struct.Point* %70 to i8*
-  tail call void @llvm.memmove.p0i8.p0i8.i64(i8* align 8 %75, i8* align 8 %76, i64 %72, i1 false) #17
+  tail call void @llvm.memmove.p0i8.p0i8.i64(i8* align 8 %75, i8* align 8 %76, i64 %72, i1 false) #16
   br label %77
 
 77:                                               ; preds = %74, %65, %48, %46, %36
@@ -650,13 +636,13 @@ define dso_local void @_Z6kMeansRKSt6vectorI5PointSaIS0_EEi(%"class.std::vector"
   %3 = alloca %"class.std::vector", align 8
   %4 = alloca %"class.std::vector.0", align 8
   %5 = bitcast %"class.std::vector"* %3 to i8*
-  call void @llvm.lifetime.start.p0i8(i64 24, i8* nonnull %5) #17
+  call void @llvm.lifetime.start.p0i8(i64 24, i8* nonnull %5) #16
   %6 = sext i32 %1 to i64
   %7 = icmp slt i32 %1, 0
   br i1 %7, label %8, label %9
 
 8:                                                ; preds = %2
-  tail call void @_ZSt20__throw_length_errorPKc(i8* noundef getelementptr inbounds ([49 x i8], [49 x i8]* @.str.4, i64 0, i64 0)) #18
+  tail call void @_ZSt20__throw_length_errorPKc(i8* noundef getelementptr inbounds ([49 x i8], [49 x i8]* @.str.4, i64 0, i64 0)) #17
   unreachable
 
 9:                                                ; preds = %2
@@ -665,323 +651,323 @@ define dso_local void @_Z6kMeansRKSt6vectorI5PointSaIS0_EEi(%"class.std::vector"
 
 11:                                               ; preds = %9
   call void @llvm.memset.p0i8.i64(i8* noundef nonnull align 8 dereferenceable(24) %5, i8 0, i64 24, i1 false)
-  br label %27
+  br label %.loopexit17
 
 12:                                               ; preds = %9
   %13 = shl nuw nsw i64 %6, 4
-  %14 = tail call noalias noundef nonnull i8* @_Znwm(i64 noundef %13) #19
+  %14 = tail call noalias noundef nonnull i8* @_Znwm(i64 noundef %13) #18
   %15 = bitcast i8* %14 to %struct.Point*
   %16 = bitcast %"class.std::vector"* %3 to i8**
   store i8* %14, i8** %16, align 8, !tbaa !10
   %17 = getelementptr inbounds %struct.Point, %struct.Point* %15, i64 %6
   %18 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %3, i64 0, i32 0, i32 0, i32 0, i32 2
   store %struct.Point* %17, %struct.Point** %18, align 8, !tbaa !22
-  tail call void @llvm.memset.p0i8.i64(i8* noundef nonnull align 8 dereferenceable(16) %14, i8 0, i64 16, i1 false) #17
+  tail call void @llvm.memset.p0i8.i64(i8* noundef nonnull align 8 dereferenceable(16) %14, i8 0, i64 16, i1 false) #16
   %19 = getelementptr inbounds i8, i8* %14, i64 16
   %20 = bitcast i8* %19 to %struct.Point*
   %21 = icmp eq i32 %1, 1
-  br i1 %21, label %27, label %22
+  br i1 %21, label %.loopexit17, label %.preheader16
 
-22:                                               ; preds = %12, %22
-  %23 = phi %struct.Point* [ %25, %22 ], [ %20, %12 ]
-  %24 = bitcast %struct.Point* %23 to i8*
-  tail call void @llvm.memcpy.p0i8.p0i8.i64(i8* noundef nonnull align 8 dereferenceable(16) %24, i8* noundef nonnull align 8 dereferenceable(16) %14, i64 16, i1 false) #17, !tbaa.struct !17
-  %25 = getelementptr inbounds %struct.Point, %struct.Point* %23, i64 1
-  %26 = icmp eq %struct.Point* %25, %17
-  br i1 %26, label %27, label %22, !llvm.loop !28
+.preheader16:                                     ; preds = %12, %.preheader16
+  %22 = phi %struct.Point* [ %24, %.preheader16 ], [ %20, %12 ]
+  %23 = bitcast %struct.Point* %22 to i8*
+  tail call void @llvm.memcpy.p0i8.p0i8.i64(i8* noundef nonnull align 8 dereferenceable(16) %23, i8* noundef nonnull align 8 dereferenceable(16) %14, i64 16, i1 false) #16, !tbaa.struct !17
+  %24 = getelementptr inbounds %struct.Point, %struct.Point* %22, i64 1
+  %25 = icmp eq %struct.Point* %24, %17
+  br i1 %25, label %.loopexit17, label %.preheader16, !llvm.loop !28
 
-27:                                               ; preds = %22, %12, %11
-  %28 = phi %struct.Point* [ %20, %12 ], [ null, %11 ], [ %17, %22 ]
-  %29 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %3, i64 0, i32 0, i32 0, i32 0, i32 1
-  store %struct.Point* %28, %struct.Point** %29, align 8, !tbaa !5
-  %30 = bitcast %"class.std::vector.0"* %4 to i8*
-  call void @llvm.lifetime.start.p0i8(i64 24, i8* nonnull %30) #17
-  %31 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %0, i64 0, i32 0, i32 0, i32 0, i32 1
-  %32 = load %struct.Point*, %struct.Point** %31, align 8, !tbaa !5
-  %33 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %0, i64 0, i32 0, i32 0, i32 0, i32 0
-  %34 = load %struct.Point*, %struct.Point** %33, align 8, !tbaa !10
-  %35 = ptrtoint %struct.Point* %32 to i64
-  %36 = ptrtoint %struct.Point* %34 to i64
-  %37 = sub i64 %35, %36
-  %38 = ashr i64 %37, 4
-  %39 = icmp slt i64 %37, 0
-  br i1 %39, label %40, label %42
+.loopexit17:                                      ; preds = %.preheader16, %12, %11
+  %26 = phi %struct.Point* [ %20, %12 ], [ null, %11 ], [ %17, %.preheader16 ]
+  %27 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %3, i64 0, i32 0, i32 0, i32 0, i32 1
+  store %struct.Point* %26, %struct.Point** %27, align 8, !tbaa !5
+  %28 = bitcast %"class.std::vector.0"* %4 to i8*
+  call void @llvm.lifetime.start.p0i8(i64 24, i8* nonnull %28) #16
+  %29 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %0, i64 0, i32 0, i32 0, i32 0, i32 1
+  %30 = load %struct.Point*, %struct.Point** %29, align 8, !tbaa !5
+  %31 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %0, i64 0, i32 0, i32 0, i32 0, i32 0
+  %32 = load %struct.Point*, %struct.Point** %31, align 8, !tbaa !10
+  %33 = ptrtoint %struct.Point* %30 to i64
+  %34 = ptrtoint %struct.Point* %32 to i64
+  %35 = sub i64 %33, %34
+  %36 = ashr i64 %35, 4
+  %37 = icmp slt i64 %35, 0
+  br i1 %37, label %38, label %40
 
-40:                                               ; preds = %27
-  invoke void @_ZSt20__throw_length_errorPKc(i8* noundef getelementptr inbounds ([49 x i8], [49 x i8]* @.str.4, i64 0, i64 0)) #18
-          to label %41 unwind label %67
+38:                                               ; preds = %.loopexit17
+  invoke void @_ZSt20__throw_length_errorPKc(i8* noundef getelementptr inbounds ([49 x i8], [49 x i8]* @.str.4, i64 0, i64 0)) #17
+          to label %39 unwind label %64
 
-41:                                               ; preds = %40
+39:                                               ; preds = %38
   unreachable
 
-42:                                               ; preds = %27
-  %43 = icmp eq i64 %37, 0
-  br i1 %43, label %44, label %45
+40:                                               ; preds = %.loopexit17
+  %41 = icmp eq i64 %35, 0
+  br i1 %41, label %42, label %43
 
-44:                                               ; preds = %42
-  call void @llvm.memset.p0i8.i64(i8* noundef nonnull align 8 dereferenceable(24) %30, i8 0, i64 24, i1 false)
-  br label %54
+42:                                               ; preds = %40
+  call void @llvm.memset.p0i8.i64(i8* noundef nonnull align 8 dereferenceable(24) %28, i8 0, i64 24, i1 false)
+  br label %52
 
-45:                                               ; preds = %42
-  %46 = lshr exact i64 %37, 2
-  %47 = invoke noalias noundef nonnull i8* @_Znwm(i64 noundef %46) #19
-          to label %48 unwind label %67
+43:                                               ; preds = %40
+  %44 = lshr exact i64 %35, 2
+  %45 = invoke noalias noundef nonnull i8* @_Znwm(i64 noundef %44) #18
+          to label %46 unwind label %64
 
-48:                                               ; preds = %45
-  %49 = bitcast i8* %47 to i32*
-  %50 = bitcast %"class.std::vector.0"* %4 to i8**
-  store i8* %47, i8** %50, align 8, !tbaa !11
-  %51 = getelementptr inbounds i32, i32* %49, i64 %38
-  %52 = getelementptr inbounds %"class.std::vector.0", %"class.std::vector.0"* %4, i64 0, i32 0, i32 0, i32 0, i32 2
-  store i32* %51, i32** %52, align 8, !tbaa !29
-  %53 = shl nsw i64 %38, 2
-  call void @llvm.memset.p0i8.i64(i8* nonnull align 4 %47, i8 0, i64 %53, i1 false), !tbaa !13
-  br label %54
+46:                                               ; preds = %43
+  %47 = bitcast i8* %45 to i32*
+  %48 = bitcast %"class.std::vector.0"* %4 to i8**
+  store i8* %45, i8** %48, align 8, !tbaa !11
+  %49 = getelementptr inbounds i32, i32* %47, i64 %36
+  %50 = getelementptr inbounds %"class.std::vector.0", %"class.std::vector.0"* %4, i64 0, i32 0, i32 0, i32 0, i32 2
+  store i32* %49, i32** %50, align 8, !tbaa !29
+  %51 = shl nsw i64 %36, 2
+  tail call void @llvm.memset.p0i8.i64(i8* nonnull align 4 %45, i8 0, i64 %51, i1 false), !tbaa !13
+  br label %52
 
-54:                                               ; preds = %48, %44
-  %55 = phi i32* [ null, %44 ], [ %49, %48 ]
-  %56 = phi i32* [ null, %44 ], [ %51, %48 ]
-  %57 = getelementptr inbounds %"class.std::vector.0", %"class.std::vector.0"* %4, i64 0, i32 0, i32 0, i32 0, i32 1
-  store i32* %56, i32** %57, align 8, !tbaa !30
-  %58 = tail call i64 @time(i64* noundef null) #17
-  %59 = trunc i64 %58 to i32
-  tail call void @srand(i32 noundef %59) #17
-  %60 = icmp sgt i32 %1, 0
-  br i1 %60, label %61, label %65
+52:                                               ; preds = %46, %42
+  %53 = phi i32* [ null, %42 ], [ %47, %46 ]
+  %54 = phi i32* [ null, %42 ], [ %49, %46 ]
+  %55 = getelementptr inbounds %"class.std::vector.0", %"class.std::vector.0"* %4, i64 0, i32 0, i32 0, i32 0, i32 1
+  store i32* %54, i32** %55, align 8, !tbaa !30
+  %56 = tail call i64 @time(i64* noundef null) #16
+  %57 = trunc i64 %56 to i32
+  tail call void @srand(i32 noundef %57) #16
+  %58 = icmp sgt i32 %1, 0
+  br i1 %58, label %59, label %.loopexit15
 
-61:                                               ; preds = %54
-  %62 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %3, i64 0, i32 0, i32 0, i32 0, i32 0
-  %63 = load %struct.Point*, %struct.Point** %62, align 8
-  %64 = zext i32 %1 to i64
-  br label %69
+59:                                               ; preds = %52
+  %60 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %3, i64 0, i32 0, i32 0, i32 0, i32 0
+  %61 = load %struct.Point*, %struct.Point** %60, align 8
+  %62 = zext i32 %1 to i64
+  br label %66
 
-65:                                               ; preds = %69, %54
-  %66 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %3, i64 0, i32 0, i32 0, i32 0, i32 0
-  br label %91
+.loopexit15:                                      ; preds = %66, %52
+  %63 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %3, i64 0, i32 0, i32 0, i32 0, i32 0
+  br label %88
 
-67:                                               ; preds = %45, %40
-  %68 = landingpad { i8*, i32 }
+64:                                               ; preds = %43, %38
+  %65 = landingpad { i8*, i32 }
           cleanup
-  br label %203
+  br label %197
 
-69:                                               ; preds = %61, %69
-  %70 = phi i64 [ 0, %61 ], [ %86, %69 ]
-  %71 = tail call i32 @rand() #17
-  %72 = sext i32 %71 to i64
-  %73 = load %struct.Point*, %struct.Point** %31, align 8, !tbaa !5
-  %74 = load %struct.Point*, %struct.Point** %33, align 8, !tbaa !10
-  %75 = ptrtoint %struct.Point* %73 to i64
-  %76 = ptrtoint %struct.Point* %74 to i64
-  %77 = sub i64 %75, %76
-  %78 = ashr exact i64 %77, 4
-  %79 = urem i64 %72, %78
-  %80 = shl i64 %79, 32
-  %81 = ashr exact i64 %80, 32
-  %82 = getelementptr inbounds %struct.Point, %struct.Point* %74, i64 %81
-  %83 = getelementptr inbounds %struct.Point, %struct.Point* %63, i64 %70
-  %84 = bitcast %struct.Point* %83 to i8*
-  %85 = bitcast %struct.Point* %82 to i8*
-  tail call void @llvm.memcpy.p0i8.p0i8.i64(i8* noundef nonnull align 8 dereferenceable(16) %84, i8* noundef nonnull align 8 dereferenceable(16) %85, i64 16, i1 false), !tbaa.struct !17
-  %86 = add nuw nsw i64 %70, 1
-  %87 = icmp eq i64 %86, %64
-  br i1 %87, label %65, label %69, !llvm.loop !31
+66:                                               ; preds = %66, %59
+  %67 = phi i64 [ 0, %59 ], [ %83, %66 ]
+  %68 = tail call i32 @rand() #16
+  %69 = sext i32 %68 to i64
+  %70 = load %struct.Point*, %struct.Point** %29, align 8, !tbaa !5
+  %71 = load %struct.Point*, %struct.Point** %31, align 8, !tbaa !10
+  %72 = ptrtoint %struct.Point* %70 to i64
+  %73 = ptrtoint %struct.Point* %71 to i64
+  %74 = sub i64 %72, %73
+  %75 = ashr exact i64 %74, 4
+  %76 = urem i64 %69, %75
+  %77 = shl i64 %76, 32
+  %78 = ashr exact i64 %77, 32
+  %79 = getelementptr inbounds %struct.Point, %struct.Point* %71, i64 %78
+  %80 = getelementptr inbounds %struct.Point, %struct.Point* %61, i64 %67
+  %81 = bitcast %struct.Point* %80 to i8*
+  %82 = bitcast %struct.Point* %79 to i8*
+  tail call void @llvm.memcpy.p0i8.p0i8.i64(i8* noundef nonnull align 8 dereferenceable(16) %81, i8* noundef nonnull align 8 dereferenceable(16) %82, i64 16, i1 false), !tbaa.struct !17
+  %83 = add nuw nsw i64 %67, 1
+  %84 = icmp eq i64 %83, %62
+  br i1 %84, label %.loopexit15, label %66, !llvm.loop !31
 
-88:                                               ; preds = %156
-  br i1 %60, label %89, label %161
+85:                                               ; preds = %151
+  br i1 %58, label %86, label %.loopexit
 
-89:                                               ; preds = %88
-  %90 = zext i32 %1 to i64
-  br label %171
-
-91:                                               ; preds = %65, %156
-  %92 = phi i32 [ 0, %65 ], [ %157, %156 ]
-  %93 = load %struct.Point*, %struct.Point** %31, align 8, !tbaa !5
-  %94 = load %struct.Point*, %struct.Point** %33, align 8, !tbaa !10
-  %95 = icmp eq %struct.Point* %93, %94
-  br i1 %95, label %155, label %96
-
-96:                                               ; preds = %91
-  %97 = load %struct.Point*, %struct.Point** %29, align 8, !tbaa !5
-  %98 = load %struct.Point*, %struct.Point** %66, align 8, !tbaa !10
-  br label %99
-
-99:                                               ; preds = %109, %96
-  %100 = phi %struct.Point* [ %94, %96 ], [ %110, %109 ]
-  %101 = phi %struct.Point* [ %93, %96 ], [ %111, %109 ]
-  %102 = phi %struct.Point* [ %98, %96 ], [ %112, %109 ]
-  %103 = phi %struct.Point* [ %97, %96 ], [ %113, %109 ]
-  %104 = phi i64 [ 0, %96 ], [ %116, %109 ]
-  %105 = icmp eq %struct.Point* %103, %102
-  br i1 %105, label %109, label %122
-
-106:                                              ; preds = %122
-  %107 = load %struct.Point*, %struct.Point** %31, align 8, !tbaa !5
-  %108 = load %struct.Point*, %struct.Point** %33, align 8, !tbaa !10
-  br label %109
-
-109:                                              ; preds = %106, %99
-  %110 = phi %struct.Point* [ %100, %99 ], [ %108, %106 ]
-  %111 = phi %struct.Point* [ %101, %99 ], [ %107, %106 ]
-  %112 = phi %struct.Point* [ %102, %99 ], [ %146, %106 ]
-  %113 = phi %struct.Point* [ %102, %99 ], [ %145, %106 ]
-  %114 = phi i32 [ 0, %99 ], [ %143, %106 ]
-  %115 = getelementptr inbounds i32, i32* %55, i64 %104
-  store i32 %114, i32* %115, align 4, !tbaa !13
-  %116 = add nuw i64 %104, 1
-  %117 = ptrtoint %struct.Point* %111 to i64
-  %118 = ptrtoint %struct.Point* %110 to i64
-  %119 = sub i64 %117, %118
-  %120 = ashr exact i64 %119, 4
-  %121 = icmp ult i64 %116, %120
-  br i1 %121, label %99, label %155, !llvm.loop !15
-
-122:                                              ; preds = %99, %152
-  %123 = phi %struct.Point* [ %154, %152 ], [ %100, %99 ]
-  %124 = phi %struct.Point* [ %146, %152 ], [ %102, %99 ]
-  %125 = phi double [ %153, %152 ], [ 0x7FEFFFFFFFFFFFFF, %99 ]
-  %126 = phi i32 [ %143, %152 ], [ 0, %99 ]
-  %127 = phi i64 [ %144, %152 ], [ 0, %99 ]
-  %128 = getelementptr inbounds %struct.Point, %struct.Point* %123, i64 %104, i32 0
-  %129 = load double, double* %128, align 8, !tbaa.struct !17
-  %130 = getelementptr inbounds %struct.Point, %struct.Point* %123, i64 %104, i32 1
-  %131 = load double, double* %130, align 8, !tbaa.struct !20
-  %132 = getelementptr inbounds %struct.Point, %struct.Point* %124, i64 %127, i32 0
-  %133 = load double, double* %132, align 8, !tbaa.struct !17
-  %134 = getelementptr inbounds %struct.Point, %struct.Point* %124, i64 %127, i32 1
-  %135 = load double, double* %134, align 8, !tbaa.struct !20
-  %136 = fsub double %129, %133
-  %137 = fsub double %131, %135
-  %138 = fmul double %137, %137
-  %139 = call double @llvm.fmuladd.f64(double %136, double %136, double %138) #17
-  %140 = call double @sqrt(double noundef %139) #17
-  %141 = fcmp olt double %140, %125
-  %142 = trunc i64 %127 to i32
-  %143 = select i1 %141, i32 %142, i32 %126
-  %144 = add nuw i64 %127, 1
-  %145 = load %struct.Point*, %struct.Point** %29, align 8, !tbaa !5
-  %146 = load %struct.Point*, %struct.Point** %66, align 8, !tbaa !10
-  %147 = ptrtoint %struct.Point* %145 to i64
-  %148 = ptrtoint %struct.Point* %146 to i64
-  %149 = sub i64 %147, %148
-  %150 = ashr exact i64 %149, 4
-  %151 = icmp ult i64 %144, %150
-  br i1 %151, label %152, label %106, !llvm.loop !21
-
-152:                                              ; preds = %122
-  %153 = select i1 %141, double %140, double %125
-  %154 = load %struct.Point*, %struct.Point** %33, align 8, !tbaa !10
-  br label %122
-
-155:                                              ; preds = %109, %91
-  invoke void @_Z15updateCentroidsRKSt6vectorI5PointSaIS0_EERKS_IiSaIiEERS2_(%"class.std::vector"* noundef nonnull align 8 dereferenceable(24) %0, %"class.std::vector.0"* noundef nonnull align 8 dereferenceable(24) %4, %"class.std::vector"* noundef nonnull align 8 dereferenceable(24) %3)
-          to label %156 unwind label %159
-
-156:                                              ; preds = %155
-  %157 = add nuw nsw i32 %92, 1
-  %158 = icmp eq i32 %157, 100
-  br i1 %158, label %88, label %91, !llvm.loop !32
-
-159:                                              ; preds = %155
-  %160 = landingpad { i8*, i32 }
-          cleanup
-  br label %198
-
-161:                                              ; preds = %193, %88
-  %162 = icmp eq i32* %55, null
-  br i1 %162, label %165, label %163
-
-163:                                              ; preds = %161
-  %164 = bitcast i32* %55 to i8*
-  call void @_ZdlPv(i8* noundef nonnull %164) #17
+86:                                               ; preds = %85
+  %87 = zext i32 %1 to i64
   br label %165
 
-165:                                              ; preds = %161, %163
-  call void @llvm.lifetime.end.p0i8(i64 24, i8* nonnull %30) #17
-  %166 = load %struct.Point*, %struct.Point** %66, align 8, !tbaa !10
-  %167 = icmp eq %struct.Point* %166, null
-  br i1 %167, label %170, label %168
+88:                                               ; preds = %151, %.loopexit15
+  %89 = phi i32 [ 0, %.loopexit15 ], [ %152, %151 ]
+  %90 = load %struct.Point*, %struct.Point** %29, align 8, !tbaa !5
+  %91 = load %struct.Point*, %struct.Point** %31, align 8, !tbaa !10
+  %92 = icmp eq %struct.Point* %90, %91
+  br i1 %92, label %.loopexit14, label %93
 
-168:                                              ; preds = %165
-  %169 = bitcast %struct.Point* %166 to i8*
-  call void @_ZdlPv(i8* noundef nonnull %169) #17
-  br label %170
+93:                                               ; preds = %88
+  %94 = load %struct.Point*, %struct.Point** %27, align 8, !tbaa !5
+  %95 = load %struct.Point*, %struct.Point** %63, align 8, !tbaa !10
+  br label %96
 
-170:                                              ; preds = %165, %168
-  call void @llvm.lifetime.end.p0i8(i64 24, i8* nonnull %5) #17
+96:                                               ; preds = %106, %93
+  %97 = phi %struct.Point* [ %91, %93 ], [ %107, %106 ]
+  %98 = phi %struct.Point* [ %90, %93 ], [ %108, %106 ]
+  %99 = phi %struct.Point* [ %95, %93 ], [ %109, %106 ]
+  %100 = phi %struct.Point* [ %94, %93 ], [ %110, %106 ]
+  %101 = phi i64 [ 0, %93 ], [ %113, %106 ]
+  %102 = icmp eq %struct.Point* %100, %99
+  br i1 %102, label %106, label %.preheader
+
+103:                                              ; preds = %.preheader
+  %104 = load %struct.Point*, %struct.Point** %29, align 8, !tbaa !5
+  %105 = load %struct.Point*, %struct.Point** %31, align 8, !tbaa !10
+  br label %106
+
+106:                                              ; preds = %103, %96
+  %107 = phi %struct.Point* [ %97, %96 ], [ %105, %103 ]
+  %108 = phi %struct.Point* [ %98, %96 ], [ %104, %103 ]
+  %109 = phi %struct.Point* [ %99, %96 ], [ %142, %103 ]
+  %110 = phi %struct.Point* [ %99, %96 ], [ %141, %103 ]
+  %111 = phi i32 [ 0, %96 ], [ %139, %103 ]
+  %112 = getelementptr inbounds i32, i32* %53, i64 %101
+  store i32 %111, i32* %112, align 4, !tbaa !13
+  %113 = add nuw i64 %101, 1
+  %114 = ptrtoint %struct.Point* %108 to i64
+  %115 = ptrtoint %struct.Point* %107 to i64
+  %116 = sub i64 %114, %115
+  %117 = ashr exact i64 %116, 4
+  %118 = icmp ult i64 %113, %117
+  br i1 %118, label %96, label %.loopexit14, !llvm.loop !15
+
+.preheader:                                       ; preds = %96, %148
+  %119 = phi %struct.Point* [ %150, %148 ], [ %97, %96 ]
+  %120 = phi %struct.Point* [ %142, %148 ], [ %99, %96 ]
+  %121 = phi double [ %149, %148 ], [ 0x7FEFFFFFFFFFFFFF, %96 ]
+  %122 = phi i32 [ %139, %148 ], [ 0, %96 ]
+  %123 = phi i64 [ %140, %148 ], [ 0, %96 ]
+  %124 = getelementptr inbounds %struct.Point, %struct.Point* %119, i64 %101, i32 0
+  %125 = load double, double* %124, align 8, !tbaa.struct !17
+  %126 = getelementptr inbounds %struct.Point, %struct.Point* %119, i64 %101, i32 1
+  %127 = load double, double* %126, align 8, !tbaa.struct !20
+  %128 = getelementptr inbounds %struct.Point, %struct.Point* %120, i64 %123, i32 0
+  %129 = load double, double* %128, align 8, !tbaa.struct !17
+  %130 = getelementptr inbounds %struct.Point, %struct.Point* %120, i64 %123, i32 1
+  %131 = load double, double* %130, align 8, !tbaa.struct !20
+  %132 = fsub double %125, %129
+  %133 = fsub double %127, %131
+  %134 = fmul double %133, %133
+  %135 = call double @llvm.fmuladd.f64(double %132, double %132, double %134) #16
+  %136 = call double @sqrt(double noundef %135) #16
+  %137 = fcmp olt double %136, %121
+  %138 = trunc i64 %123 to i32
+  %139 = select i1 %137, i32 %138, i32 %122
+  %140 = add nuw i64 %123, 1
+  %141 = load %struct.Point*, %struct.Point** %27, align 8, !tbaa !5
+  %142 = load %struct.Point*, %struct.Point** %63, align 8, !tbaa !10
+  %143 = ptrtoint %struct.Point* %141 to i64
+  %144 = ptrtoint %struct.Point* %142 to i64
+  %145 = sub i64 %143, %144
+  %146 = ashr exact i64 %145, 4
+  %147 = icmp ult i64 %140, %146
+  br i1 %147, label %148, label %103, !llvm.loop !21
+
+148:                                              ; preds = %.preheader
+  %149 = select i1 %137, double %136, double %121
+  %150 = load %struct.Point*, %struct.Point** %31, align 8, !tbaa !10
+  br label %.preheader
+
+.loopexit14:                                      ; preds = %106, %88
+  invoke void @_Z15updateCentroidsRKSt6vectorI5PointSaIS0_EERKS_IiSaIiEERS2_(%"class.std::vector"* noundef nonnull align 8 dereferenceable(24) %0, %"class.std::vector.0"* noundef nonnull align 8 dereferenceable(24) %4, %"class.std::vector"* noundef nonnull align 8 dereferenceable(24) %3)
+          to label %151 unwind label %154
+
+151:                                              ; preds = %.loopexit14
+  %152 = add nuw nsw i32 %89, 1
+  %153 = icmp eq i32 %152, 100
+  br i1 %153, label %85, label %88, !llvm.loop !32
+
+154:                                              ; preds = %.loopexit14
+  %155 = landingpad { i8*, i32 }
+          cleanup
+  br label %192
+
+.loopexit:                                        ; preds = %187, %85
+  %156 = icmp eq i32* %53, null
+  br i1 %156, label %159, label %157
+
+157:                                              ; preds = %.loopexit
+  %158 = bitcast i32* %53 to i8*
+  call void @_ZdlPv(i8* noundef nonnull %158) #16
+  br label %159
+
+159:                                              ; preds = %157, %.loopexit
+  call void @llvm.lifetime.end.p0i8(i64 24, i8* nonnull %28) #16
+  %160 = load %struct.Point*, %struct.Point** %63, align 8, !tbaa !10
+  %161 = icmp eq %struct.Point* %160, null
+  br i1 %161, label %164, label %162
+
+162:                                              ; preds = %159
+  %163 = bitcast %struct.Point* %160 to i8*
+  call void @_ZdlPv(i8* noundef nonnull %163) #16
+  br label %164
+
+164:                                              ; preds = %162, %159
+  call void @llvm.lifetime.end.p0i8(i64 24, i8* nonnull %5) #16
   ret void
 
-171:                                              ; preds = %89, %193
-  %172 = phi i64 [ 0, %89 ], [ %194, %193 ]
-  %173 = invoke noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8) @_ZSt4cout, i8* noundef nonnull getelementptr inbounds ([9 x i8], [9 x i8]* @.str, i64 0, i64 0), i64 noundef 8)
-          to label %174 unwind label %196
+165:                                              ; preds = %187, %86
+  %166 = phi i64 [ 0, %86 ], [ %188, %187 ]
+  %167 = invoke noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8) @_ZSt4cout, i8* noundef nonnull getelementptr inbounds ([9 x i8], [9 x i8]* @.str, i64 0, i64 0), i64 noundef 8)
+          to label %168 unwind label %190
 
-174:                                              ; preds = %171
-  %175 = trunc i64 %172 to i32
-  %176 = invoke noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEi(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8) @_ZSt4cout, i32 noundef %175)
-          to label %177 unwind label %196
+168:                                              ; preds = %165
+  %169 = trunc i64 %166 to i32
+  %170 = invoke noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEi(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8) @_ZSt4cout, i32 noundef %169)
+          to label %171 unwind label %190
 
-177:                                              ; preds = %174
-  %178 = invoke noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8) %176, i8* noundef nonnull getelementptr inbounds ([13 x i8], [13 x i8]* @.str.1, i64 0, i64 0), i64 noundef 12)
-          to label %179 unwind label %196
+171:                                              ; preds = %168
+  %172 = invoke noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8) %170, i8* noundef nonnull getelementptr inbounds ([13 x i8], [13 x i8]* @.str.1, i64 0, i64 0), i64 noundef 12)
+          to label %173 unwind label %190
 
-179:                                              ; preds = %177
-  %180 = load %struct.Point*, %struct.Point** %66, align 8, !tbaa !10
-  %181 = getelementptr inbounds %struct.Point, %struct.Point* %180, i64 %172, i32 0
-  %182 = load double, double* %181, align 8, !tbaa !33
-  %183 = invoke noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSo9_M_insertIdEERSoT_(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8) %176, double noundef %182)
-          to label %184 unwind label %196
+173:                                              ; preds = %171
+  %174 = load %struct.Point*, %struct.Point** %63, align 8, !tbaa !10
+  %175 = getelementptr inbounds %struct.Point, %struct.Point* %174, i64 %166, i32 0
+  %176 = load double, double* %175, align 8, !tbaa !33
+  %177 = invoke noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSo9_M_insertIdEERSoT_(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8) %170, double noundef %176)
+          to label %178 unwind label %190
 
-184:                                              ; preds = %179
-  %185 = invoke noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8) %183, i8* noundef nonnull getelementptr inbounds ([3 x i8], [3 x i8]* @.str.2, i64 0, i64 0), i64 noundef 2)
-          to label %186 unwind label %196
+178:                                              ; preds = %173
+  %179 = invoke noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8) %177, i8* noundef nonnull getelementptr inbounds ([3 x i8], [3 x i8]* @.str.2, i64 0, i64 0), i64 noundef 2)
+          to label %180 unwind label %190
 
-186:                                              ; preds = %184
-  %187 = load %struct.Point*, %struct.Point** %66, align 8, !tbaa !10
-  %188 = getelementptr inbounds %struct.Point, %struct.Point* %187, i64 %172, i32 1
-  %189 = load double, double* %188, align 8, !tbaa !35
-  %190 = invoke noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSo9_M_insertIdEERSoT_(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8) %183, double noundef %189)
-          to label %191 unwind label %196
+180:                                              ; preds = %178
+  %181 = load %struct.Point*, %struct.Point** %63, align 8, !tbaa !10
+  %182 = getelementptr inbounds %struct.Point, %struct.Point* %181, i64 %166, i32 1
+  %183 = load double, double* %182, align 8, !tbaa !35
+  %184 = invoke noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSo9_M_insertIdEERSoT_(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8) %177, double noundef %183)
+          to label %185 unwind label %190
 
-191:                                              ; preds = %186
-  %192 = invoke noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8) %190, i8* noundef nonnull getelementptr inbounds ([3 x i8], [3 x i8]* @.str.3, i64 0, i64 0), i64 noundef 2)
-          to label %193 unwind label %196
+185:                                              ; preds = %180
+  %186 = invoke noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* noundef nonnull align 8 dereferenceable(8) %184, i8* noundef nonnull getelementptr inbounds ([3 x i8], [3 x i8]* @.str.3, i64 0, i64 0), i64 noundef 2)
+          to label %187 unwind label %190
 
-193:                                              ; preds = %191
-  %194 = add nuw nsw i64 %172, 1
-  %195 = icmp eq i64 %194, %90
-  br i1 %195, label %161, label %171, !llvm.loop !36
+187:                                              ; preds = %185
+  %188 = add nuw nsw i64 %166, 1
+  %189 = icmp eq i64 %188, %87
+  br i1 %189, label %.loopexit, label %165, !llvm.loop !36
 
-196:                                              ; preds = %191, %186, %184, %179, %177, %171, %174
-  %197 = landingpad { i8*, i32 }
+190:                                              ; preds = %185, %180, %178, %173, %171, %168, %165
+  %191 = landingpad { i8*, i32 }
           cleanup
-  br label %198
+  br label %192
 
-198:                                              ; preds = %196, %159
-  %199 = phi { i8*, i32 } [ %160, %159 ], [ %197, %196 ]
-  %200 = icmp eq i32* %55, null
-  br i1 %200, label %203, label %201
+192:                                              ; preds = %190, %154
+  %193 = phi { i8*, i32 } [ %155, %154 ], [ %191, %190 ]
+  %194 = icmp eq i32* %53, null
+  br i1 %194, label %197, label %195
 
-201:                                              ; preds = %198
-  %202 = bitcast i32* %55 to i8*
-  call void @_ZdlPv(i8* noundef nonnull %202) #17
-  br label %203
+195:                                              ; preds = %192
+  %196 = bitcast i32* %53 to i8*
+  call void @_ZdlPv(i8* noundef nonnull %196) #16
+  br label %197
 
-203:                                              ; preds = %201, %198, %67
-  %204 = phi { i8*, i32 } [ %68, %67 ], [ %199, %198 ], [ %199, %201 ]
-  call void @llvm.lifetime.end.p0i8(i64 24, i8* nonnull %30) #17
-  %205 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %3, i64 0, i32 0, i32 0, i32 0, i32 0
-  %206 = load %struct.Point*, %struct.Point** %205, align 8, !tbaa !10
-  %207 = icmp eq %struct.Point* %206, null
-  br i1 %207, label %210, label %208
+197:                                              ; preds = %195, %192, %64
+  %198 = phi { i8*, i32 } [ %65, %64 ], [ %193, %192 ], [ %193, %195 ]
+  call void @llvm.lifetime.end.p0i8(i64 24, i8* nonnull %28) #16
+  %199 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %3, i64 0, i32 0, i32 0, i32 0, i32 0
+  %200 = load %struct.Point*, %struct.Point** %199, align 8, !tbaa !10
+  %201 = icmp eq %struct.Point* %200, null
+  br i1 %201, label %204, label %202
 
-208:                                              ; preds = %203
-  %209 = bitcast %struct.Point* %206 to i8*
-  call void @_ZdlPv(i8* noundef nonnull %209) #17
-  br label %210
+202:                                              ; preds = %197
+  %203 = bitcast %struct.Point* %200 to i8*
+  call void @_ZdlPv(i8* noundef nonnull %203) #16
+  br label %204
 
-210:                                              ; preds = %208, %203
-  call void @llvm.lifetime.end.p0i8(i64 24, i8* nonnull %5) #17
-  resume { i8*, i32 } %204
+204:                                              ; preds = %202, %197
+  call void @llvm.lifetime.end.p0i8(i64 24, i8* nonnull %5) #16
+  resume { i8*, i32 } %198
 }
 
 ; Function Attrs: nounwind
@@ -999,7 +985,7 @@ declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* 
 define dso_local noundef i32 @main() local_unnamed_addr #10 personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) {
   %1 = alloca %"class.std::vector", align 8
   %2 = bitcast %"class.std::vector"* %1 to i8*
-  call void @llvm.lifetime.start.p0i8(i64 24, i8* nonnull %2) #17
+  call void @llvm.lifetime.start.p0i8(i64 24, i8* nonnull %2) #16
   %3 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %1, i64 0, i32 0, i32 0, i32 0, i32 1
   %4 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %1, i64 0, i32 0, i32 0, i32 0, i32 2
   %5 = getelementptr inbounds %"class.std::vector", %"class.std::vector"* %1, i64 0, i32 0, i32 0, i32 0, i32 0
@@ -1012,15 +998,15 @@ define dso_local noundef i32 @main() local_unnamed_addr #10 personality i8* bitc
   invoke void @_Z6kMeansRKSt6vectorI5PointSaIS0_EEi(%"class.std::vector"* noundef nonnull align 8 dereferenceable(24) %1, i32 noundef 3)
           to label %66 unwind label %71
 
-7:                                                ; preds = %0, %55
+7:                                                ; preds = %55, %0
   %8 = phi %struct.Point* [ null, %0 ], [ %56, %55 ]
   %9 = phi %struct.Point* [ null, %0 ], [ %57, %55 ]
   %10 = phi %struct.Point* [ null, %0 ], [ %59, %55 ]
   %11 = phi i32 [ 0, %0 ], [ %60, %55 ]
-  %12 = tail call i32 @rand() #17
+  %12 = tail call i32 @rand() #16
   %13 = srem i32 %12, 100
   %14 = sitofp i32 %13 to double
-  %15 = tail call i32 @rand() #17
+  %15 = tail call i32 @rand() #16
   %16 = srem i32 %15, 100
   %17 = sitofp i32 %16 to double
   %18 = icmp eq %struct.Point* %10, %9
@@ -1042,7 +1028,7 @@ define dso_local noundef i32 @main() local_unnamed_addr #10 personality i8* bitc
   br i1 %27, label %28, label %30
 
 28:                                               ; preds = %22
-  invoke void @_ZSt20__throw_length_errorPKc(i8* noundef getelementptr inbounds ([26 x i8], [26 x i8]* @.str.5, i64 0, i64 0)) #18
+  invoke void @_ZSt20__throw_length_errorPKc(i8* noundef getelementptr inbounds ([26 x i8], [26 x i8]* @.str.5, i64 0, i64 0)) #17
           to label %29 unwind label %64
 
 29:                                               ; preds = %28
@@ -1057,9 +1043,9 @@ define dso_local noundef i32 @main() local_unnamed_addr #10 personality i8* bitc
   %36 = or i1 %34, %35
   %37 = select i1 %36, i64 576460752303423487, i64 %33
   %38 = icmp ne i64 %37, 0
-  call void @llvm.assume(i1 %38)
+  tail call void @llvm.assume(i1 %38)
   %39 = shl nuw nsw i64 %37, 4
-  %40 = invoke noalias noundef nonnull i8* @_Znwm(i64 noundef %39) #19
+  %40 = invoke noalias noundef nonnull i8* @_Znwm(i64 noundef %39) #18
           to label %41 unwind label %62
 
 41:                                               ; preds = %30
@@ -1074,7 +1060,7 @@ define dso_local noundef i32 @main() local_unnamed_addr #10 personality i8* bitc
 
 47:                                               ; preds = %41
   %48 = bitcast %struct.Point* %8 to i8*
-  tail call void @llvm.memmove.p0i8.p0i8.i64(i8* nonnull align 8 %40, i8* align 8 %48, i64 %25, i1 false) #17
+  tail call void @llvm.memmove.p0i8.p0i8.i64(i8* nonnull align 8 %40, i8* align 8 %48, i64 %25, i1 false) #16
   br label %49
 
 49:                                               ; preds = %47, %41
@@ -1083,7 +1069,7 @@ define dso_local noundef i32 @main() local_unnamed_addr #10 personality i8* bitc
 
 51:                                               ; preds = %49
   %52 = bitcast %struct.Point* %8 to i8*
-  tail call void @_ZdlPv(i8* noundef nonnull %52) #17
+  tail call void @_ZdlPv(i8* noundef nonnull %52) #16
   br label %53
 
 53:                                               ; preds = %51, %49
@@ -1115,11 +1101,11 @@ define dso_local noundef i32 @main() local_unnamed_addr #10 personality i8* bitc
 
 68:                                               ; preds = %66
   %69 = bitcast %struct.Point* %56 to i8*
-  tail call void @_ZdlPv(i8* noundef nonnull %69) #17
+  tail call void @_ZdlPv(i8* noundef nonnull %69) #16
   br label %70
 
-70:                                               ; preds = %66, %68
-  call void @llvm.lifetime.end.p0i8(i64 24, i8* nonnull %2) #17
+70:                                               ; preds = %68, %66
+  call void @llvm.lifetime.end.p0i8(i64 24, i8* nonnull %2) #16
   ret i32 0
 
 71:                                               ; preds = %6
@@ -1127,7 +1113,7 @@ define dso_local noundef i32 @main() local_unnamed_addr #10 personality i8* bitc
           cleanup
   br label %73
 
-73:                                               ; preds = %62, %64, %71
+73:                                               ; preds = %71, %64, %62
   %74 = phi %struct.Point* [ %56, %71 ], [ %8, %62 ], [ %8, %64 ]
   %75 = phi { i8*, i32 } [ %72, %71 ], [ %63, %62 ], [ %65, %64 ]
   %76 = icmp eq %struct.Point* %74, null
@@ -1135,11 +1121,11 @@ define dso_local noundef i32 @main() local_unnamed_addr #10 personality i8* bitc
 
 77:                                               ; preds = %73
   %78 = bitcast %struct.Point* %74 to i8*
-  tail call void @_ZdlPv(i8* noundef nonnull %78) #17
+  tail call void @_ZdlPv(i8* noundef nonnull %78) #16
   br label %79
 
-79:                                               ; preds = %73, %77
-  call void @llvm.lifetime.end.p0i8(i64 24, i8* nonnull %2) #17
+79:                                               ; preds = %77, %73
+  call void @llvm.lifetime.end.p0i8(i64 24, i8* nonnull %2) #16
   resume { i8*, i32 } %75
 }
 
@@ -1168,15 +1154,15 @@ declare noundef nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* 
 ; Function Attrs: uwtable
 define internal void @_GLOBAL__sub_I_source.cpp() #9 section ".text.startup" {
   tail call void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"* noundef nonnull align 1 dereferenceable(1) @_ZStL8__ioinit)
-  %1 = tail call i32 @__cxa_atexit(void (i8*)* bitcast (void (%"class.std::ios_base::Init"*)* @_ZNSt8ios_base4InitD1Ev to void (i8*)*), i8* getelementptr inbounds (%"class.std::ios_base::Init", %"class.std::ios_base::Init"* @_ZStL8__ioinit, i64 0, i32 0), i8* nonnull @__dso_handle) #17
+  %1 = tail call i32 @__cxa_atexit(void (i8*)* bitcast (void (%"class.std::ios_base::Init"*)* @_ZNSt8ios_base4InitD1Ev to void (i8*)*), i8* getelementptr inbounds (%"class.std::ios_base::Init", %"class.std::ios_base::Init"* @_ZStL8__ioinit, i64 0, i32 0), i8* nonnull @__dso_handle) #16
   ret void
 }
 
-; Function Attrs: nofree nosync nounwind readnone speculatable willreturn
-declare i64 @llvm.umax.i64(i64, i64) #15
+; Function Attrs: mustprogress nofree nosync nounwind readnone speculatable willreturn
+declare i64 @llvm.umax.i64(i64, i64) #5
 
-; Function Attrs: inaccessiblememonly nofree nosync nounwind willreturn
-declare void @llvm.assume(i1 noundef) #16
+; Function Attrs: inaccessiblememonly mustprogress nofree nosync nounwind willreturn
+declare void @llvm.assume(i1 noundef) #15
 
 attributes #0 = { "frame-pointer"="none" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="skylake" "target-features"="+64bit,+adx,+aes,+avx,+avx2,+bmi,+bmi2,+clflushopt,+cmov,+crc32,+cx16,+cx8,+f16c,+fma,+fsgsbase,+fxsr,+invpcid,+lzcnt,+mmx,+movbe,+pclmul,+popcnt,+prfchw,+rdrnd,+rdseed,+sahf,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave,+xsavec,+xsaveopt,+xsaves,-amx-bf16,-amx-int8,-amx-tile,-avx512bf16,-avx512bitalg,-avx512bw,-avx512cd,-avx512dq,-avx512er,-avx512f,-avx512fp16,-avx512ifma,-avx512pf,-avx512vbmi,-avx512vbmi2,-avx512vl,-avx512vnni,-avx512vp2intersect,-avx512vpopcntdq,-avxvnni,-cldemote,-clwb,-clzero,-enqcmd,-fma4,-gfni,-hreset,-kl,-lwp,-movdir64b,-movdiri,-mwaitx,-pconfig,-pku,-prefetchwt1,-ptwrite,-rdpid,-rtm,-serialize,-sgx,-sha,-shstk,-sse4a,-tbm,-tsxldtrk,-uintr,-vaes,-vpclmulqdq,-waitpkg,-wbnoinvd,-widekl,-xop" }
 attributes #1 = { nounwind "frame-pointer"="none" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="skylake" "target-features"="+64bit,+adx,+aes,+avx,+avx2,+bmi,+bmi2,+clflushopt,+cmov,+crc32,+cx16,+cx8,+f16c,+fma,+fsgsbase,+fxsr,+invpcid,+lzcnt,+mmx,+movbe,+pclmul,+popcnt,+prfchw,+rdrnd,+rdseed,+sahf,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave,+xsavec,+xsaveopt,+xsaves,-amx-bf16,-amx-int8,-amx-tile,-avx512bf16,-avx512bitalg,-avx512bw,-avx512cd,-avx512dq,-avx512er,-avx512f,-avx512fp16,-avx512ifma,-avx512pf,-avx512vbmi,-avx512vbmi2,-avx512vl,-avx512vnni,-avx512vp2intersect,-avx512vpopcntdq,-avxvnni,-cldemote,-clwb,-clzero,-enqcmd,-fma4,-gfni,-hreset,-kl,-lwp,-movdir64b,-movdiri,-mwaitx,-pconfig,-pku,-prefetchwt1,-ptwrite,-rdpid,-rtm,-serialize,-sgx,-sha,-shstk,-sse4a,-tbm,-tsxldtrk,-uintr,-vaes,-vpclmulqdq,-waitpkg,-wbnoinvd,-widekl,-xop" }
@@ -1193,11 +1179,10 @@ attributes #11 = { noreturn "frame-pointer"="none" "no-trapping-math"="true" "st
 attributes #12 = { nobuiltin allocsize(0) "frame-pointer"="none" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="skylake" "target-features"="+64bit,+adx,+aes,+avx,+avx2,+bmi,+bmi2,+clflushopt,+cmov,+crc32,+cx16,+cx8,+f16c,+fma,+fsgsbase,+fxsr,+invpcid,+lzcnt,+mmx,+movbe,+pclmul,+popcnt,+prfchw,+rdrnd,+rdseed,+sahf,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave,+xsavec,+xsaveopt,+xsaves,-amx-bf16,-amx-int8,-amx-tile,-avx512bf16,-avx512bitalg,-avx512bw,-avx512cd,-avx512dq,-avx512er,-avx512f,-avx512fp16,-avx512ifma,-avx512pf,-avx512vbmi,-avx512vbmi2,-avx512vl,-avx512vnni,-avx512vp2intersect,-avx512vpopcntdq,-avxvnni,-cldemote,-clwb,-clzero,-enqcmd,-fma4,-gfni,-hreset,-kl,-lwp,-movdir64b,-movdiri,-mwaitx,-pconfig,-pku,-prefetchwt1,-ptwrite,-rdpid,-rtm,-serialize,-sgx,-sha,-shstk,-sse4a,-tbm,-tsxldtrk,-uintr,-vaes,-vpclmulqdq,-waitpkg,-wbnoinvd,-widekl,-xop" }
 attributes #13 = { nobuiltin nounwind "frame-pointer"="none" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="skylake" "target-features"="+64bit,+adx,+aes,+avx,+avx2,+bmi,+bmi2,+clflushopt,+cmov,+crc32,+cx16,+cx8,+f16c,+fma,+fsgsbase,+fxsr,+invpcid,+lzcnt,+mmx,+movbe,+pclmul,+popcnt,+prfchw,+rdrnd,+rdseed,+sahf,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+ssse3,+x87,+xsave,+xsavec,+xsaveopt,+xsaves,-amx-bf16,-amx-int8,-amx-tile,-avx512bf16,-avx512bitalg,-avx512bw,-avx512cd,-avx512dq,-avx512er,-avx512f,-avx512fp16,-avx512ifma,-avx512pf,-avx512vbmi,-avx512vbmi2,-avx512vl,-avx512vnni,-avx512vp2intersect,-avx512vpopcntdq,-avxvnni,-cldemote,-clwb,-clzero,-enqcmd,-fma4,-gfni,-hreset,-kl,-lwp,-movdir64b,-movdiri,-mwaitx,-pconfig,-pku,-prefetchwt1,-ptwrite,-rdpid,-rtm,-serialize,-sgx,-sha,-shstk,-sse4a,-tbm,-tsxldtrk,-uintr,-vaes,-vpclmulqdq,-waitpkg,-wbnoinvd,-widekl,-xop" }
 attributes #14 = { argmemonly mustprogress nofree nounwind willreturn writeonly }
-attributes #15 = { nofree nosync nounwind readnone speculatable willreturn }
-attributes #16 = { inaccessiblememonly nofree nosync nounwind willreturn }
-attributes #17 = { nounwind }
-attributes #18 = { noreturn }
-attributes #19 = { allocsize(0) }
+attributes #15 = { inaccessiblememonly mustprogress nofree nosync nounwind willreturn }
+attributes #16 = { nounwind }
+attributes #17 = { noreturn }
+attributes #18 = { allocsize(0) }
 
 !llvm.module.flags = !{!0, !1, !2, !3}
 !llvm.ident = !{!4}
