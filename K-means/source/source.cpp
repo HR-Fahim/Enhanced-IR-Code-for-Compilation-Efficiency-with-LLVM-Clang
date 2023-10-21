@@ -1,97 +1,52 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
-#include <limits>
-#include <cstdlib>
-#include <ctime>
+#include <algorithm>
 
-// Define a data structure for points
+using namespace std;
+
 struct Point {
-    double x;
-    double y;
+  double x;
+  double y;
+  int label;  // Added label to the Point struct
 };
 
-// Function to calculate the Euclidean distance between two points
-double distance(Point p1, Point p2) {
-    return sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
+struct Distance {
+  double dist;
+  int label;
+};
+
+vector<Distance> find_k_nearest_neighbors(Point p, vector<Point> points, int k) {
+  vector<Distance> distances;
+
+  for (int i = 0; i < points.size(); i++) {
+    double dist = sqrt(pow(p.x - points[i].x, 2) + pow(p.y - points[i].y, 2));
+    distances.push_back({dist, i});
+  }
+
+  sort(distances.begin(), distances.end(), [](Distance a, Distance b) { return a.dist < b.dist; });
+
+  return vector<Distance>(distances.begin(), distances.begin() + k);
 }
 
-// Function to assign each point to the nearest centroid
-void assignToClusters(const std::vector<Point>& points, const std::vector<Point>& centroids, std::vector<int>& clusterAssignments) {
-    for (size_t i = 0; i < points.size(); i++) {
-        double minDistance = std::numeric_limits<double>::max();
-        int closestCentroid = 0;
+int classify_point(Point p, vector<Point> points, int k) {
+  vector<Distance> distances = find_k_nearest_neighbors(p, points, k);
 
-        for (size_t j = 0; j < centroids.size(); j++) {
-            double dist = distance(points[i], centroids[j]);
-            if (dist < minDistance) {
-                minDistance = dist;
-                closestCentroid = j;
-            }
-        }
+  int counts[2] = {0, 0};
+  for (int i = 0; i < k; i++) {
+    counts[points[distances[i].label].label]++;
+  }
 
-        clusterAssignments[i] = closestCentroid;
-    }
-}
-
-// Function to update the centroids based on the assigned clusters
-void updateCentroids(const std::vector<Point>& points, const std::vector<int>& clusterAssignments, std::vector<Point>& centroids) {
-    std::vector<Point> newCentroids(centroids.size(), {0, 0});
-    std::vector<int> clusterSizes(centroids.size(), 0);
-
-    for (size_t i = 0; i < points.size(); i++) {
-        int cluster = clusterAssignments[i];
-        newCentroids[cluster].x += points[i].x;
-        newCentroids[cluster].y += points[i].y;
-        clusterSizes[cluster]++;
-    }
-
-    for (size_t i = 0; i < centroids.size(); i++) {
-        if (clusterSizes[i] > 0) {
-            newCentroids[i].x /= clusterSizes[i];
-            newCentroids[i].y /= clusterSizes[i];
-        }
-    }
-
-    centroids = newCentroids;
-}
-
-// Function to perform K-means clustering
-void kMeans(const std::vector<Point>& points, int k) {
-    std::vector<Point> centroids(k);
-    std::vector<int> clusterAssignments(points.size(), 0);
-
-    // Initialize centroids with random points from the dataset
-    std::srand(std::time(0));
-    for (int i = 0; i < k; i++) {
-        int randomIndex = std::rand() % points.size();
-        centroids[i] = points[randomIndex];
-    }
-
-    const int maxIterations = 100;
-    for (int iteration = 0; iteration < maxIterations; iteration++) {
-        assignToClusters(points, centroids, clusterAssignments);
-        updateCentroids(points, clusterAssignments, centroids);
-    }
-
-    // Print the final cluster assignments and centroids
-    for (int i = 0; i < k; i++) {
-        std::cout << "Cluster " << i << " centroid: (" << centroids[i].x << ", " << centroids[i].y << ")\n";
-    }
+  return counts[0] > counts[1] ? 0 : 1;
 }
 
 int main() {
-    // Generate some random data points for testing
-    std::vector<Point> points;
-    for (int i = 0; i < 100; i++) {
-        points.push_back({static_cast<double>(std::rand() % 100), static_cast<double>(std::rand() % 100)});
-    }
+  vector<Point> points = {{1, 1, 0}, {2, 2, 0}, {3, 3, 0}, {4, 4, 1}, {5, 5, 1}}; // Added labels
+  Point p = {1.5, 1.5, 0};  // Added label
+  int k = 3;
 
-    // Specify the number of clusters (K)
-    int k = 3;
+  int label = classify_point(p, points, k);
+  cout << "Label: " << label << endl;
 
-    // Perform K-means clustering
-    kMeans(points, k);
-
-    return 0;
+  return 0;
 }

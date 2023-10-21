@@ -9,7 +9,7 @@ num_runs = 200
 results = []
 
 # Run the command, capture the output, and store the results in a CSV file
-with open("./K-means/optimized/optimized_time_log.csv", "w", newline="") as csvfile:
+with open("./K-means/optimized/time_log.csv", "w", newline="") as csvfile:
     fieldnames = ["Real Time", "User Time", "Sys Time"]
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     
