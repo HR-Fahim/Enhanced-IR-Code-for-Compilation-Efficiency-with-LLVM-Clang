@@ -1,52 +1,117 @@
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <string>
 #include <cmath>
 #include <algorithm>
+#include <limits>
+#include <random>
 
-using namespace std;
-
+// Define a structure for data points
 struct Point {
-  double x;
-  double y;
-  int label;  // Added label to the Point struct
+    double x, y;
+    int cluster;
+
+    Point(double x, double y) : x(x), y(y), cluster(-1) {}
 };
 
-struct Distance {
-  double dist;
-  int label;
-};
-
-vector<Distance> find_k_nearest_neighbors(Point p, vector<Point> points, int k) {
-  vector<Distance> distances;
-
-  for (int i = 0; i < points.size(); i++) {
-    double dist = sqrt(pow(p.x - points[i].x, 2) + pow(p.y - points[i].y, 2));
-    distances.push_back({dist, i});
-  }
-
-  sort(distances.begin(), distances.end(), [](Distance a, Distance b) { return a.dist < b.dist; });
-
-  return vector<Distance>(distances.begin(), distances.begin() + k);
+// Function to calculate the Euclidean distance between two points
+double euclideanDistance(Point p1, Point p2) {
+    return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
 }
 
-int classify_point(Point p, vector<Point> points, int k) {
-  vector<Distance> distances = find_k_nearest_neighbors(p, points, k);
+// Function to perform K-Means clustering
+void kMeansClustering(std::vector<Point>& points, int k, int maxIterations) {
+    int numPoints = points.size();
 
-  int counts[2] = {0, 0};
-  for (int i = 0; i < k; i++) {
-    counts[points[distances[i].label].label]++;
-  }
+    // Initialize random cluster assignments
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> randCluster(0, k - 1);
 
-  return counts[0] > counts[1] ? 0 : 1;
+    for (int i = 0; i < numPoints; ++i) {
+        points[i].cluster = randCluster(gen);
+    }
+
+    for (int iter = 0; iter < maxIterations; ++iter) {
+        // Calculate cluster centroids
+        std::vector<Point> centroids(k, {0.0, 0.0});
+        std::vector<int> clusterSizes(k, 0);
+
+        for (int i = 0; i < numPoints; ++i) {
+            int cluster = points[i].cluster;
+            centroids[cluster].x += points[i].x;
+            centroids[cluster].y += points[i].y;
+            clusterSizes[cluster]++;
+        }
+
+        for (int j = 0; j < k; ++j) {
+            if (clusterSizes[j] > 0) {
+                centroids[j].x /= clusterSizes[j];
+                centroids[j].y /= clusterSizes[j];
+            }
+        }
+
+        // Update cluster assignments
+        bool changed = false;
+        for (int i = 0; i < numPoints; ++i) {
+            int currentCluster = points[i].cluster;
+            int closestCluster = currentCluster;
+            double minDistance = euclideanDistance(points[i], centroids[currentCluster]);
+
+            for (int j = 0; j < k; ++j) {
+                double distance = euclideanDistance(points[i], centroids[j]);
+                if (distance < minDistance) {
+                    closestCluster = j;
+                    minDistance = distance;
+                }
+            }
+
+            if (currentCluster != closestCluster) {
+                points[i].cluster = closestCluster;
+                changed = true;
+            }
+        }
+
+        if (!changed) {
+            break;
+        }
+    }
 }
 
 int main() {
-  vector<Point> points = {{1, 1, 0}, {2, 2, 0}, {3, 3, 0}, {4, 4, 1}, {5, 5, 1}}; // Added labels
-  Point p = {1.5, 1.5, 0};  // Added label
-  int k = 3;
+    // Load the dataset
+    std::ifstream file("/mnt/c/Users/Asus/Desktop/CSE425/Project/Enhanced-IR-Code-for-Compilation-Efficiency-with-LLVM-Clang/K-means/data/dataset.csv");
+    if (!file.is_open()) {
+        std::cerr << "Error opening the dataset file." << std::endl;
+        return 1;
+    }
 
-  int label = classify_point(p, points, k);
-  cout << "Label: " << label << endl;
+    std::vector<Point> points;
+    std::string line;
+    std::getline(file, line);  // Skip the header
 
-  return 0;
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        std::string token;
+        double x, y;
+        for (int i = 0; std::getline(iss, token, ','); i++) {
+            if (i == 3) x = std::stod(token);
+            if (i == 4) y = std::stod(token);
+        }
+        points.emplace_back(x, y);
+    }
+
+    // Perform K-Means clustering
+    int numClusters = 5;
+    int maxIterations = 100;
+    kMeansClustering(points, numClusters, maxIterations);
+
+    // Output the cluster assignments
+    for (int i = 0; i < points.size(); ++i) {
+        std::cout << "Data point " << i << " is in Cluster " << points[i].cluster + 1 << std::endl;
+    }
+
+    return 0;
 }
