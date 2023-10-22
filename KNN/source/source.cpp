@@ -68,7 +68,7 @@ int kNearestNeighbors(const std::vector<DataPoint>& trainData, const DataPoint& 
 
 int main() {
     // Load the dataset
-    std::ifstream file("/mnt/c/Users/Asus/Desktop/CSE425/Project/Enhanced-IR-Code-for-Compilation-Efficiency-with-LLVM-Clang/KNN/data/dataset.csv");
+    std::ifstream file("/mnt/c/Users/Asus/Desktop/CSE425/Project/Enhanced-IR-Code-for-Compilation-Efficiency-with-LLVM-Clang/KNN/data/sample_dataset.csv");
     if (!file.is_open()) {
         std::cerr << "Error opening the dataset file." << std::endl;
         return 1;

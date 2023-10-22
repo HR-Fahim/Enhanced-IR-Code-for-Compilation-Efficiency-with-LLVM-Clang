@@ -1,154 +1,99 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <vector>
+#include <string>
+#include <algorithm>
 #include <cmath>
+#include <random>
+#include <numeric>
+#include <set>
+#include <cassert>
 
-using namespace std;
+// Define a structure for a data point
+struct DataPoint {
+    std::vector<double> features;
+    int label;
 
-class SVM {
-public:
-  SVM(double C, double kernel_type, double gamma) {
-    this->C = C;
-    this->kernel_type = kernel_type;
-    this->gamma = gamma;
-    this->toler = 1e-3;
-    this->eps = 1e-3;
-  }
-
-  void fit(vector<vector<double>> X, vector<int> y) {
-    int n_samples = X.size();
-    int n_features = X[0].size();
-
-    // Initialize the kernel matrix.
-    K = vector<vector<double>>(n_samples, vector<double>(n_samples));
-    for (int i = 0; i < n_samples; i++) {
-      for (int j = 0; j < n_samples; j++) {
-        K[i][j] = kernel(X[i], X[j]);
-      }
-    }
-
-    // Initialize the Lagrange multipliers.
-    alpha = vector<double>(n_samples, 0);
-
-    // Initialize the bias term.
-    b = 0;
-
-    // Store the training data and labels.
-    this->X = X;
-    this->y = y;
-
-    // Solve the optimization problem.
-    for (int iter = 0; iter < 100; iter++) {
-      for (int i = 0; i < n_samples; i++) {
-        double Ei = predict(X[i]) - y[i];
-        if ((Ei < -toler && alpha[i] < C) || (Ei > toler && alpha[i] > 0)) {
-          int j = select_j(i, Ei);
-          double Ej = predict(X[j]) - y[j];
-
-          double alpha_i_old = alpha[i];
-          double alpha_j_old = alpha[j];
-
-          double L = max(0.0, alpha[i] + alpha[j] - C);
-          double H = min(C, alpha[i] + alpha[j]);
-          if (L == H) {
-            continue;
-          }
-
-          double eta = 2 * K[i][j] - K[i][i] - K[j][j];
-          if (eta >= 0) {
-            continue;
-          }
-
-          alpha[j] = alpha[j] - (Ei - Ej) / eta;
-
-          if (alpha[j] > H) {
-            alpha[j] = H;
-          } else if (alpha[j] < L) {
-            alpha[j] = L;
-          }
-
-          if (abs(alpha[j] - alpha_j_old) < eps) {
-            continue;
-          }
-
-          alpha[i] = alpha[i] + alpha_j_old - alpha[j];
-
-          // Update the bias term.
-          b = b + Ei + (alpha[i] - alpha_i_old) * K[i][i] + (alpha[j] - alpha_j_old) * K[i][j];
-        }
-      }
-    }
-  }
-
-  int predict(vector<double> x) {
-    double s = 0;
-    for (int i = 0; i < alpha.size(); i++) {
-      s += alpha[i] * y[i] * kernel(x, X[i]);
-    }
-    return s + b >= 0 ? 1 : -1;
-  }
-
-private:
-  double C;
-  double kernel_type;
-  double gamma;
-  double toler;
-  double eps;
-  vector<vector<double>> K;
-  vector<double> alpha;
-  double b;
-  vector<vector<double>> X; // Added for storing training data
-  vector<int> y; // Added for storing labels
-
-  double kernel(vector<double> x1, vector<double> x2) {
-    if (kernel_type == 0) {  // Linear kernel.
-      return dot(x1, x2);
-    } else if (kernel_type == 1) {  // RBF kernel.
-      return exp(-gamma * norm(x1, x2));
-    } else {
-      return 0;
-    }
-  }
-
-  double dot(vector<double> x1, vector<double> x2) {
-    double s = 0;
-    for (int i = 0; i < x1.size(); i++) {
-      s += x1[i] * x2[i];
-    }
-    return s;
-  }
-
-  double norm(vector<double> x1, vector<double> x2) {
-    double s = 0;
-    for (int i = 0; i < x1.size(); i++) {
-      double diff = x1[i] - x2[i];
-      s += diff * diff;
-    }
-    return sqrt(s);
-  }
-
-  int select_j(int i, double Ei) {
-    // Implement the selection of a second alpha (j) based on the maximum step length.
-    // You can use heuristics or strategies to select j.
-    return 0; // Placeholder, you need to implement the selection logic.
-  }
+    DataPoint(const std::vector<double>& features, int label) : features(features), label(label) {}
 };
 
+// Function to calculate the Euclidean distance between two data points
+double euclideanDistance(const DataPoint& p1, const DataPoint& p2) {
+    double distance = 0.0;
+    for (size_t i = 0; i < p1.features.size(); ++i) {
+        distance += std::pow(p1.features[i] - p2.features[i], 2);
+    }
+    return std::sqrt(distance);
+}
+
+// Function to perform SVM classification
+double svmClassification(const std::vector<DataPoint>& trainData, const DataPoint& testPoint, double C, double gamma) {
+    double prediction = 0.0;
+    for (const DataPoint& trainPoint : trainData) {
+        double kernelValue = 0.0;
+        for (size_t i = 0; i < trainPoint.features.size(); ++i) {
+            kernelValue += std::pow(trainPoint.features[i] - testPoint.features[i], 2);
+        }
+        kernelValue = std::exp(-gamma * kernelValue);
+        prediction += trainPoint.label * kernelValue;
+    }
+    prediction -= 1.0; // Subtract bias
+
+    return prediction;
+}
+
 int main() {
-  // Create an SVM instance and provide values for C, kernel_type, and gamma.
-  SVM svm(1.0, 0, 1.0);
+    // Load the dataset
+    std::ifstream file("/mnt/c/Users/Asus/Desktop/CSE425/Project/Enhanced-IR-Code-for-Compilation-Efficiency-with-LLVM-Clang/SVM/data/sample_dataset.csv");
+    if (!file.is_open()) {
+        std::cerr << "Error opening the dataset file." << std::endl;
+        return 1;
+    }
 
-  // Load your training data and labels.
-  vector<vector<double>> X = {{1.0, 1.1}, {2.0, 1.0}, {1.3, 1.5}, {1.2, 1.0}};
-  vector<int> y = {1, 1, -1, -1};
+    std::vector<DataPoint> trainData;
+    std::vector<DataPoint> testData;
 
-  // Fit the SVM model to the data.
-  svm.fit(X, y);
+    std::string line;
+    std::getline(file, line);  // Skip the header
 
-  // Test a new data point.
-  vector<double> test_point = {1.3, 1.2};
-  int prediction = svm.predict(test_point);
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        std::string token;
+        std::vector<double> features;
+        int label;
+        for (int i = 0; std::getline(iss, token, ','); i++) {
+            if (i < 2) {
+                features.push_back(std::stod(token));
+            } else if (i == 2) {
+                label = std::stoi(token);
+            }
+        }
 
-  cout << "Predicted Label: " << prediction << endl;
+        // Split the dataset into training and testing data (80% training, 20% testing)
+        if (rand() % 5 != 0) {
+            trainData.emplace_back(features, label);
+        } else {
+            testData.emplace_back(features, label);
+        }
+    }
 
-  return 0;
+    // Set SVM hyperparameters (you can adjust these)
+    double C = 1.0;    // Regularization parameter
+    double gamma = 0.1; // Kernel coefficient (for RBF kernel)
+
+    // Perform SVM classification on the test data
+    int correctPredictions = 0;
+    for (const DataPoint& testPoint : testData) {
+        double prediction = svmClassification(trainData, testPoint, C, gamma);
+        if ((prediction > 0 && testPoint.label == 1) || (prediction < 0 && testPoint.label == 0)) {
+            correctPredictions++;
+        }
+    }
+
+    // Calculate and print the accuracy
+    double accuracy = static_cast<double>(correctPredictions) / testData.size();
+    std::cout << "Model accuracy: " << accuracy << std::endl;
+
+    return 0;
 }

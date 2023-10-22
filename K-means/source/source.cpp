@@ -82,7 +82,7 @@ void kMeansClustering(std::vector<Point>& points, int k, int maxIterations) {
 
 int main() {
     // Load the dataset
-    std::ifstream file("/mnt/c/Users/Asus/Desktop/CSE425/Project/Enhanced-IR-Code-for-Compilation-Efficiency-with-LLVM-Clang/K-means/data/dataset.csv");
+    std::ifstream file("/mnt/c/Users/Asus/Desktop/CSE425/Project/Enhanced-IR-Code-for-Compilation-Efficiency-with-LLVM-Clang/K-means/data/sample_dataset.csv");
     if (!file.is_open()) {
         std::cerr << "Error opening the dataset file." << std::endl;
         return 1;
