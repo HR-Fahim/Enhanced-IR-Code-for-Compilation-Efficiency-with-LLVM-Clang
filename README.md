@@ -1,5 +1,7 @@
 # Enhanced IR Code for Compilation Efficiency with LLVM Clang
 
+<sub> ****P.S.*** The project was completed under CSE425 (Concepts of Programming Language) course offered by North South University.*<sub/>
+
 ## Abstract
 
 This project focuses on providing energy-efficient, high-performance implementations of machine learning algorithms in C/C++. The key algorithms include K-Nearest Neighbors (KNN), Naive Bayes, and Decision Trees, crucial for data analysis and data-driven decision-making. The goal is to reduce energy usage significantly while maintaining optimal algorithmic performance, contributing to sustainable machine learning practices and environmentally conscious computing.
