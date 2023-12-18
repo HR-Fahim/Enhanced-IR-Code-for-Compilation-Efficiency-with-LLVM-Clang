@@ -6,6 +6,8 @@
 
 This project focuses on providing energy-efficient, high-performance implementations of machine learning algorithms in C/C++. The key algorithms include K-Nearest Neighbors (KNN), Naive Bayes, and Decision Trees, crucial for data analysis and data-driven decision-making. The goal is to reduce energy usage significantly while maintaining optimal algorithmic performance, contributing to sustainable machine learning practices and environmentally conscious computing.
 
+<sub> ****P.S.*** Read the blog post from [here](https://medium.com/@hrfprofessional/enhanced-ir-code-for-compilation-efficiency-with-llvm-clang-1687dfc1eff5).*
+
 ## Introduction
 
 The project aims to build energy-efficient, high-performance implementations of machine learning algorithms, specifically K-Nearest Neighbors (KNN), Support Vector Machine (SVM), and Decision Trees, using C/C++. The emphasis is on leveraging compiler optimization techniques like LLVM to enhance software efficiency and promote environmentally friendly computing methods.
